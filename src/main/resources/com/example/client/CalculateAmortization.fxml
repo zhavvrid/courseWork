@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane prefHeight="600.0" prefWidth="1200.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+
+        <!-- Панель выбора параметров для расчета амортизации -->
+        <HBox layoutX="20.0" layoutY="20.0" spacing="10">
+            <children>
+                <ComboBox fx:id="methodComboBox" promptText="Метод амортизации" style="-fx-pref-width: 200px;" />
+                <DatePicker fx:id="startDatePicker" promptText="Начало периода" style="-fx-pref-width: 150px;" />
+                <DatePicker fx:id="endDatePicker" promptText="Конец периода" style="-fx-pref-width: 150px;" />
+                <Button fx:id="calculateButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Рассчитать" />
+            </children>
+        </HBox>
+
+        <!-- Таблица с результатами амортизации -->
+        <TableView fx:id="depreciationTable" layoutX="20.0" layoutY="70.0" prefHeight="480.0" prefWidth="1162.0" style="-fx-font-size: 10;">
+            <columns>
+                <TableColumn prefWidth="91.33334541320801" text="Название ОС" />
+                <TableColumn prefWidth="98.00005340576172" text="Инв. номер" />
+                <TableColumn prefWidth="100.00001525878906" text="Стоимость (нач. п.)" />
+                <TableColumn prefWidth="122.0" text="Амортизация (нач. п.)" />
+                <TableColumn prefWidth="88.66665649414062" text="Увелич. стоим." />
+                <TableColumn prefWidth="139.33331298828125" text="Амортизация (за период)" />
+                <TableColumn prefWidth="111.99993896484375" text="Уменьш. стоимости" />
+                <TableColumn prefWidth="120.0" text="Стоимость (кон. п.)" />
+                <TableColumn prefWidth="130.0" text="Амортизация (кон. п.)" />
+                <TableColumn prefWidth="158.6666259765625" text="Ост. стоимость" />
+            </columns>
+        </TableView>
+
+        <!-- Кнопки для экспорта и создания отчетов -->
+        <HBox layoutX="20.0" layoutY="560.0" spacing="10">
+            <children>
+                <Button fx:id="exportButton" style="-fx-background-color: #FF5722; -fx-text-fill: white;" text="Экспорт в Excel" />
+                <Button fx:id="generateReportButton" style="-fx-background-color: #FF9800; -fx-text-fill: white;" text="Создать отчет" />
+            </children>
+        </HBox>
+
+    </children>
+</AnchorPane>

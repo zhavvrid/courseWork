@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.example.client.FixedAssetController">
+    <center>
+        <HBox spacing="10">
+            <VBox spacing="10">
+                <Button fx:id="addButton" onAction="#openAddAssetWindow" text="Добавить" />
+                <Button fx:id="deleteButton" onAction="#deleteSelectedAsset" text="Удалить" />
+                <Button fx:id="editButton" onAction="#editSelectedAsset" text="Редактировать" />
+                <Button fx:id="searchButton" onAction="#searchAssets" text="Поиск" />
+                <ComboBox fx:id="sortParameterComboBox" promptText="Выберите параметр сортировки"/>
+                <ComboBox fx:id="sortDirectionComboBox" promptText="Направление"/>
+                <Button fx:id="sortButton" onAction="#sortAssets" text="Сортировать" />
+                <ComboBox fx:id="searchParameterComboBox" />
+                <TextField fx:id="searchField" />
+                <Button fx:id="calculateButton"  onAction="#openDepreciationCalculationWindow" text="Рассчитать амортизацию" />
+            </VBox>
+            <TableView fx:id="assetsTable" prefWidth="600">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" />
+                    <TableColumn fx:id="nameColumn" text="Название" />
+                    <TableColumn fx:id="inventoryNumberColumn" text="Инвентарный номер" />
+                    <TableColumn fx:id="purchaseDateColumn" text="Дата покупки" />
+                    <TableColumn fx:id="initialCostColumn" text="Начальная стоимость" />
+                    <TableColumn fx:id="usefulLifeColumn" text="Срок полезного использования" />
+                    <TableColumn fx:id="residualValueColumn" text="Ликвидационная стоимость" />
+                    <TableColumn fx:id="depreciationMethodColumn" text="Метод амортизации" />
+                    <TableColumn fx:id="categoryColumn" text="Категория" />
+                </columns>
+            </TableView>
+        </HBox>
+    </center>
+</BorderPane>

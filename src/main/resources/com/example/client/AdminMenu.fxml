@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.AdminMenuController">
+    <children>
+        <!-- Верхний заголовок -->
+        <Button fx:id="headerButton" layoutX="200.0" layoutY="20.0" style="-fx-font-size: 28; -fx-background-color: transparent;" text="Меню администратора" textFill="#f2ecec" />
+
+        <!-- Основное меню с кнопками для переходов -->
+        <AnchorPane layoutX="50.0" layoutY="100.0" prefHeight="450.0" prefWidth="700.0" style="-fx-background-color: #fafafa;">
+            <children>
+                <VBox alignment="TOP_CENTER" layoutX="20.0" layoutY="20.0" prefHeight="402.0" prefWidth="289.0" spacing="10.0">
+                    <!-- Управление учетными записями -->
+                    <Button fx:id="manageAccountsButton" prefHeight="36.0" prefWidth="297.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16;" text="Управление учетными записями" />
+                    <Button fx:id="manageAssetsButton" onAction="#openManageAssetWindow" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16;" text="Управление основными средствами" />
+
+                    <!-- Отчеты и аналитика -->
+                    <Button fx:id="depreciationReportsButton" prefHeight="36.0" prefWidth="293.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16;" text="Отчеты по амортизации" />
+                    <Button fx:id="messageAccountantButton" prefHeight="36.0" prefWidth="293.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16;" text="Сообщение бухгалтеру" />
+                    <Button fx:id="exitButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16;" text="Выход" />
+                </VBox>
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>
