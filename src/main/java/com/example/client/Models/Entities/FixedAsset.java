@@ -30,6 +30,17 @@ public class FixedAsset {
         this.category = category;
     }
 
+    public FixedAsset(String name, String inventoryNumber, String purchaseDate, double initialCost, int usefulLife, double residualValue, String depreciationMethod, String category) {
+        this.name = name;
+        this.inventoryNumber = inventoryNumber;
+        this.purchaseDate = purchaseDate;
+        this.initialCost = initialCost;
+        this.usefulLife = usefulLife;
+        this.residualValue = residualValue;
+        this.depreciationMethod = depreciationMethod;
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         return "FixedAsset{" +

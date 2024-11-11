@@ -30,15 +30,12 @@ public class EditAssetController {
     @FXML
     private TextField categoryField;
 
-
-        // Existing fields
         private FixedAsset asset;
-        private FixedAssetController fixedAssetController; // Add this field
-
+        private FixedAssetController fixedAssetController;
         public void setAsset(FixedAsset asset, FixedAssetController controller) {
             this.asset = asset;
-            this.fixedAssetController = controller; // Set the controller
-            // Populate fields with current asset values
+            this.fixedAssetController = controller;
+
             nameField.setText(asset.getName());
             inventoryNumberField.setText(asset.getInventoryNumber());
             purchaseDateField.setText(asset.getPurchaseDate());
@@ -61,14 +58,10 @@ public class EditAssetController {
             asset.setDepreciationMethod(depreciationMethodField.getText());
             asset.setCategory(categoryField.getText());
 
-            // Send updated asset to the server
             sendUpdateRequest(asset);
 
-            // Call loadAssets to refresh the table in the FixedAssetController
             fixedAssetController.loadAssets(); // Refresh assets in the main table
 
-
-            // Close the edit window
             ((Stage) nameField.getScene().getWindow()).close();
         }
 

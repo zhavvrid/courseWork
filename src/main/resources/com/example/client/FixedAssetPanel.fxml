@@ -7,36 +7,36 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.example.client.FixedAssetController">
-    <center>
-        <HBox spacing="10">
-            <VBox spacing="10">
-                <Button fx:id="addButton" onAction="#openAddAssetWindow" text="Добавить" />
-                <Button fx:id="deleteButton" onAction="#deleteSelectedAsset" text="Удалить" />
-                <Button fx:id="editButton" onAction="#editSelectedAsset" text="Редактировать" />
-                <Button fx:id="searchButton" onAction="#searchAssets" text="Поиск" />
-                <ComboBox fx:id="sortParameterComboBox" promptText="Выберите параметр сортировки"/>
-                <ComboBox fx:id="sortDirectionComboBox" promptText="Направление"/>
-                <Button fx:id="sortButton" onAction="#sortAssets" text="Сортировать" />
-                <ComboBox fx:id="searchParameterComboBox" />
-                <TextField fx:id="searchField" />
-                <Button fx:id="calculateButton"  onAction="#openDepreciationCalculationWindow" text="Рассчитать амортизацию" />
-            </VBox>
-            <TableView fx:id="assetsTable" prefWidth="600">
-                <columns>
-                    <TableColumn fx:id="idColumn" text="ID" />
-                    <TableColumn fx:id="nameColumn" text="Название" />
-                    <TableColumn fx:id="inventoryNumberColumn" text="Инвентарный номер" />
-                    <TableColumn fx:id="purchaseDateColumn" text="Дата покупки" />
-                    <TableColumn fx:id="initialCostColumn" text="Начальная стоимость" />
-                    <TableColumn fx:id="usefulLifeColumn" text="Срок полезного использования" />
-                    <TableColumn fx:id="residualValueColumn" text="Ликвидационная стоимость" />
-                    <TableColumn fx:id="depreciationMethodColumn" text="Метод амортизации" />
-                    <TableColumn fx:id="categoryColumn" text="Категория" />
-                </columns>
-            </TableView>
+<BorderPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.FixedAssetController">
+    <top>
+        <!-- Панель с кнопками и элементами управления -->
+        <HBox spacing="10" BorderPane.alignment="CENTER">
+            <Button fx:id="addButton" onAction="#openAddAssetWindow" text="➕" />
+            <Button fx:id="deleteButton" onAction="#deleteSelectedAsset" text="🗑️" />
+            <Button fx:id="editButton" onAction="#editSelectedAsset" text="✏️" />
+            <TextField fx:id="searchField" promptText="Поиск..." />
+            <ComboBox fx:id="searchParameterComboBox" promptText="Параметр поиска" />
+            <Button fx:id="searchButton" onAction="#searchAssets" text="🔍" />
+            <Button fx:id="calculateButton" onAction="#openDepreciationCalculationWindow" text="Рассчитать амортизацию" />
+            <Button fx:id="viewAmortizationAssets" onAction="#loadAmortization" text="Вывести все фонды" />
         </HBox>
+    </top>
+    <center>
+        <!-- Таблица с активами -->
+        <TableView fx:id="assetsTable" prefWidth="600">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" />
+                <TableColumn fx:id="nameColumn" text="Название" />
+                <TableColumn fx:id="inventoryNumberColumn" text="Инвентарный номер" />
+                <TableColumn fx:id="purchaseDateColumn" text="Дата покупки" />
+                <TableColumn fx:id="initialCostColumn" text="Начальная стоимость" />
+                <TableColumn fx:id="usefulLifeColumn" text="Срок полезного использования" />
+                <TableColumn fx:id="residualValueColumn" text="Ликвидационная стоимость" />
+                <TableColumn fx:id="depreciationMethodColumn" text="Метод амортизации" />
+                <TableColumn fx:id="categoryColumn" text="Категория" />
+            </columns>
+        </TableView>
     </center>
 </BorderPane>

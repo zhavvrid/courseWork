@@ -27,8 +27,7 @@
 
                 <ComboBox fx:id="categoryComboBox" layoutX="370.0" layoutY="180.0" prefHeight="25.0" prefWidth="280.0" promptText="Категория ОС" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
 
-                <Button fx:id="calculateDepreciationButton" layoutX="213.0" layoutY="281.0" minHeight="25.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #3F51B5; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Рассчитать амортизацию" />
-
+                <Button fx:id="calculateDepreciationButton" layoutX="213.0" layoutY="281.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleCalculateDepreciationButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #3F51B5; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Рассчитать амортизацию" />
                 <Button fx:id="saveButton" layoutX="214.0" layoutY="340.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleSaveButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #4CAF50; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Сохранить" />
 
                 <Button fx:id="clearButton" layoutX="213.0" layoutY="400.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleClearButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #FF7043; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Очистить" />

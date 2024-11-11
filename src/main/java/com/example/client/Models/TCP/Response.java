@@ -8,6 +8,7 @@ public class Response {
     private Boolean success;
 
     private String role;
+    private int id;
 
     public String getRole() {
         return role;
@@ -42,6 +43,13 @@ public class Response {
     }
     public void setSuccess(Boolean success) {
         this.success = success;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
 }

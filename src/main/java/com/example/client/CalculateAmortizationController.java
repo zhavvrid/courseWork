@@ -1,196 +1,243 @@
 package com.example.client;
 
 import com.example.client.Enums.RequestType;
+import com.example.client.Models.Entities.DepreciationCalculation;
 import com.example.client.Models.Entities.FixedAsset;
 import com.example.client.Models.TCP.Request;
 import com.example.client.Models.TCP.Response;
 import com.example.client.Utility.ClientSocket;
-import com.example.client.Utility.LocalDateAdapter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CalculateAmortizationController {
 
     @FXML
-    private Button calculateButton;
-
+    private TableColumn<DepreciationCalculation, String> nameColumn;
     @FXML
-    private TableView<FixedAsset> depreciationTable;
-
+    private TableColumn<DepreciationCalculation, String> inventoryNumberColumn;
     @FXML
-    private DatePicker endDatePicker;
-
+    private TableColumn<DepreciationCalculation, String> depreciationMethodColumn;
     @FXML
-    private Button exportButton;
-
+    private TableColumn<DepreciationCalculation, BigDecimal> initialCostColumn;
     @FXML
-    private Button generateReportButton;
-
+    private TableColumn<DepreciationCalculation, BigDecimal> depreciationAmountColumn;
     @FXML
-    private ComboBox<String> methodComboBox;
-
+    private TableColumn<DepreciationCalculation, BigDecimal> accumulatedDepreciationColumn;
+    @FXML
+    private TableColumn<DepreciationCalculation, BigDecimal> residualValueCol;
+    @FXML
+    private TableColumn<DepreciationCalculation, BigDecimal> residualValueColumn;
+    @FXML
+    private TableColumn<DepreciationCalculation, BigDecimal> usefulLifeColumn;
+    @FXML
+    private TableView<DepreciationCalculation> depreciationTable;
+    @FXML
+    private TableColumn<DepreciationCalculation, String> purchaseDateColumn;
+    @FXML
+    private TableColumn<DepreciationCalculation, String> depreciationCalculationDateColumn;
+    @FXML
+    private TableColumn<DepreciationCalculation, Number> rowNumberColumn;
     @FXML
     private DatePicker startDatePicker;
 
-    private ObservableList<FixedAsset> fixedAssets;
-    Gson gson = new Gson();
+    @FXML
+    private DatePicker endDatePicker;
+    @FXML
+    private BarChart<String, Number> depreciationBarChart;
 
-    public CalculateAmortizationController() { }
+    @FXML
+    private LineChart<String, Number> depreciationLineChart;
 
-
-    public void initialize() {
-        // Инициализация данных и настройка таблицы
-        setupTableColumns();
-        loadFixedAssetsFromDatabase();
-
-        // Заполнение ComboBox методами амортизации
-        methodComboBox.setItems(FXCollections.observableArrayList("Линейный", "Метод уменьшаемого остатка", "Производственный"));
-
-        // Обработка нажатия на кнопку "Рассчитать"
-        calculateButton.setOnAction(event -> calculateDepreciation());
+    private FixedAsset selectedAsset;
+    private final Gson gson = new Gson();
+    private List<FixedAsset> assets = new ArrayList<>();
+    @FXML
+    void initialize(){
+        rowNumberColumn.setCellValueFactory(column ->
+                new ReadOnlyObjectWrapper<>(depreciationTable.getItems().indexOf(column.getValue()) + 1)
+        );
     }
+    public void setSelectedAsset(FixedAsset selectedAsset) {
+        this.selectedAsset = selectedAsset;
+        calculateAmortization();
 
-    private void setupTableColumns() {
-        TableColumn<FixedAsset, String> nameColumn = new TableColumn<>("Название ОС");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<FixedAsset, String> inventoryNumberColumn = new TableColumn<>("Инв. номер");
-        inventoryNumberColumn.setCellValueFactory(new PropertyValueFactory<>("inventoryNumber"));
-
-        TableColumn<FixedAsset, Double> initialCostColumn = new TableColumn<>("Стоимость (нач. п.)");
-        initialCostColumn.setCellValueFactory(new PropertyValueFactory<>("initialCost"));
-
-        TableColumn<FixedAsset, Double> residualValueColumn = new TableColumn<>("Ост. стоимость");
-        residualValueColumn.setCellValueFactory(new PropertyValueFactory<>("residualValue"));
-
-        TableColumn<FixedAsset, Double> depreciationColumn = new TableColumn<>("Амортизация (за период)");
-
-        depreciationTable.getColumns().addAll(nameColumn, inventoryNumberColumn, initialCostColumn, residualValueColumn, depreciationColumn);
     }
-
-    private void loadFixedAssetsFromDatabase() {
-        try {
-            // Создаем запрос на получение всех активов
-            Request request = new Request(RequestType.GETALL_ASSET, null);
-            String jsonRequest = gson.toJson(request);
-
-            // Отправляем запрос на сервер
-            ClientSocket.getInstance().getOut().println(jsonRequest);
-            ClientSocket.getInstance().getOut().flush();
-
-            // Обрабатываем ответ от сервера
-            handleServerResponse();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Ошибка", "Ошибка при загрузке данных об основных средствах: " + e.getMessage());
+    public void displayAmortizationResults(JsonArray amortizationResults) {
+        ObservableList<DepreciationCalculation> results = FXCollections.observableArrayList();
+        for (JsonElement element : amortizationResults) {
+            DepreciationCalculation result = gson.fromJson(element, DepreciationCalculation.class);
+            results.add(result);
         }
+
+        depreciationTable.setItems(results);
+        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFixedAsset().getName()));
+        inventoryNumberColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFixedAsset().getInventoryNumber()));
+        depreciationMethodColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDepreciationMethod()));
+        initialCostColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getInitialCost()));
+        usefulLifeColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(BigDecimal.valueOf(cellData.getValue().getUsefulLife())));
+        depreciationAmountColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getDepreciationAmount()));
+        accumulatedDepreciationColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getAccumulatedDepreciation()));
+        residualValueCol.setCellValueFactory(cellData -> new SimpleObjectProperty<>(BigDecimal.valueOf(cellData.getValue().getResidualValueFromAsset())));
+        residualValueColumn.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getResidualValue()));
+        purchaseDateColumn.setCellValueFactory(cellData->new SimpleStringProperty(cellData.getValue().getPurchaseDate()));
+        depreciationCalculationDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCalculationDate()));
     }
 
-    private void handleServerResponse() {
-        try {
-            BufferedReader in = ClientSocket.getInstance().getIn();
-            String responseLine = in.readLine();
 
-            if (responseLine != null) {
-                Response response = gson.fromJson(responseLine, Response.class);
-
-                if (response.getSuccess()) {
-                    // Парсинг данных основных средств из JSON-ответа
-                    Type listType = new TypeToken<List<FixedAsset>>() {}.getType();
-                    List<FixedAsset> assets = gson.fromJson(response.getMessage(), listType);
-
-                    // Обновляем таблицу с загруженными основными средствами
-                    fixedAssets = FXCollections.observableArrayList(assets);
-                    depreciationTable.setItems(fixedAssets);
-
-                    System.out.println("Данные загружены успешно.");
-                } else {
-                    showAlert("Ошибка", "Ошибка от сервера: " + response.getMessage());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Ошибка", "Ошибка при получении ответа от сервера: " + e.getMessage());
-        }
-    }
-
-    private void calculateDepreciation() {
-        String selectedMethod = methodComboBox.getValue();
+    @FXML
+    private void filterByDateRange() {
         LocalDate startDate = startDatePicker.getValue();
         LocalDate endDate = endDatePicker.getValue();
 
-        if (selectedMethod == null || startDate == null || endDate == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Пожалуйста, выберите метод амортизации и даты.");
-            alert.show();
+        if (startDate != null && endDate != null) {
+            ObservableList<DepreciationCalculation> filteredResults = depreciationTable.getItems().filtered(
+                    item -> {
+                        LocalDate calculationDate = LocalDate.parse(item.getCalculationDate());
+                        return !calculationDate.isBefore(startDate) && !calculationDate.isAfter(endDate);
+                    }
+            );
+            depreciationTable.setItems(filteredResults);
+        } else {
+            showAlert("Ошибка", "Пожалуйста, выберите обе даты для фильтрации.");
+        }
+    }
+
+
+
+    @FXML
+    private void generateReport() {
+        ObservableList<DepreciationCalculation> data = depreciationTable.getItems();
+        if (data.isEmpty()) {
+            showAlert("Ошибка", "Нет данных для генерации отчета.");
             return;
         }
 
-        for (FixedAsset asset : fixedAssets) {
-            double depreciationValue = 0;
+        try {
+            // Загрузка FXML для окна отчета
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ReportWindow.fxml"));
+            AnchorPane reportRoot = loader.load();
 
-            // Рассчитываем амортизацию в зависимости от метода
-            switch (selectedMethod) {
-                case "Линейный":
-                    depreciationValue = calculateLinearDepreciation(asset, startDate, endDate);
-                    break;
-                case "Метод уменьшаемого остатка":
-                    depreciationValue = calculateDecliningBalanceDepreciation(asset, startDate, endDate);
-                    break;
-                case "Производственный":
-                    // depreciationValue = calculateProductionDepreciation(asset);
-                    break;
+            // Получение контроллера окна отчета
+            ReportWindowController reportController = loader.getController();
+            reportController.createChart(new ArrayList<>(data)); // Передаем данные для графика
+
+            // Создание нового окна для отчета
+            Stage reportStage = new Stage();
+            reportStage.setTitle("Отчет по амортизации");
+            reportStage.setScene(new Scene(reportRoot));
+            reportStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось открыть окно отчета: " + e.getMessage());
+        }
+    }
+
+
+
+
+    @FXML
+    public void calculateAmortization() {
+        if (selectedAsset == null) {
+            showAlert("Ошибка", "Не выбран актив для расчета.");
+            return;
+        }
+
+        String selectedMethod = selectedAsset.getDepreciationMethod();
+        JsonObject searchJson = new JsonObject();
+        searchJson.addProperty("assetId", selectedAsset.getId());
+        searchJson.addProperty("method", selectedMethod);
+
+        Request request = new Request();
+        request.setRequestType(RequestType.CALCULATE_AMORTIZATION);
+        request.setMessage(searchJson.toString());
+
+        try {
+            PrintWriter out = ClientSocket.getInstance().getOut();
+            out.println(gson.toJson(request));
+            out.flush();
+
+            BufferedReader in = ClientSocket.getInstance().getIn();
+            String responseString = in.readLine();
+            Response response = gson.fromJson(responseString, Response.class);
+            System.out.println("Response string: " + responseString);
+
+            if (response.getSuccess()) {
+                JsonArray amortizationResults = gson.fromJson(response.getMessage(), JsonArray.class);
+                Platform.runLater(() -> displayAmortizationResults(amortizationResults));
+            } else {
+                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
             }
-
-            // Здесь можно добавить расчетные значения в таблицу или обновить объект FixedAsset
-            System.out.println("Амортизация для " + asset.getName() + ": " + depreciationValue);
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось выполнить расчет амортизации: " + e.getMessage());
         }
     }
 
-    private double calculateLinearDepreciation(FixedAsset asset, LocalDate startDate, LocalDate endDate) {
-        int years = endDate.getYear() - startDate.getYear();
-        return (asset.getInitialCost() - asset.getResidualValue()) / asset.getUsefulLife() * years;
+
+    @FXML
+    private void exportToExcel() {
+        // Реализуйте логику экспорта данных в Excel
+        showAlert("Информация", "Экспорт в Excel будет реализован позже.");
     }
 
-    private double calculateDecliningBalanceDepreciation(FixedAsset asset, LocalDate startDate, LocalDate endDate) {
-        double rate = 2.0 / asset.getUsefulLife(); // Коэффициент амортизации
-        double depreciation = 0;
-        double currentValue = asset.getInitialCost();
+@FXML
+    public void loadAmortization() {
 
-        for (int i = 0; i < endDate.getYear() - startDate.getYear(); i++) {
-            depreciation += currentValue * rate;
-            currentValue -= depreciation;
+        Request request = new Request();
+        request.setRequestType(RequestType.GETALL_AMORTIZATION);
+
+        try {
+            PrintWriter out = ClientSocket.getInstance().getOut();
+            out.println(gson.toJson(request));
+            out.flush();
+
+            BufferedReader in = ClientSocket.getInstance().getIn();
+            String responseString = in.readLine();
+            Response response = gson.fromJson(responseString, Response.class);
+            System.out.println("Response string: " + responseString);
+
+            if (response.getSuccess()) {
+                JsonArray amortizationResults = gson.fromJson(response.getMessage(), JsonArray.class);
+                Platform.runLater(() -> displayAmortizationResults(amortizationResults));
+            } else {
+                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось выполнить расчет амортизации: " + e.getMessage());
         }
-        return depreciation;
     }
 
-  /*  private double calculateProductionDepreciation(FixedAsset asset) {
-        // Предполагается, что метод уже реализован, если необходимо
-        double totalProduction = asset.getTotalProduction();  // общее количество единиц производства за весь срок
-        double periodProduction = asset.getPeriodProduction();  // количество единиц производства за текущий период
 
-        if (totalProduction == 0) {
-            return 0;  // Избегаем деления на ноль
-        }
-
-        // Формула амортизации по производственному методу
-        return (asset.getInitialCost() - asset.getResidualValue()) * (periodProduction / totalProduction);
-    }*/
 
     private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

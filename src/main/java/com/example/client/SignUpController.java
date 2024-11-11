@@ -74,6 +74,17 @@ public class SignUpController {
             showAlert("Ошибка", "Ошибка при получении ответа от сервера: " + e.getMessage());
         }
     }
+    private void clearFields() {
+        login_field.clear();
+        password_field.clear();
+        login_field.clear();
+        name_field.clear();
+        email_field.clear();
+    }
+    @FXML
+    private void handleClearButtonAction() {
+        clearFields();
+    }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

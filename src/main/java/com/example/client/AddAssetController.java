@@ -6,18 +6,26 @@ package com.example.client;
         import com.example.client.Models.TCP.Response;
         import com.example.client.Utility.ClientSocket;
         import com.google.gson.Gson;
+        import com.google.gson.JsonArray;
+        import com.google.gson.JsonObject;
+        import javafx.application.Platform;
         import javafx.collections.FXCollections;
         import javafx.collections.ObservableList;
         import javafx.fxml.FXML;
+        import javafx.fxml.FXMLLoader;
+        import javafx.scene.Parent;
+        import javafx.scene.Scene;
         import javafx.scene.control.Alert;
         import javafx.scene.control.Button;
         import javafx.scene.control.ComboBox;
         import javafx.scene.control.DatePicker;
         import javafx.scene.control.TextField;
         import javafx.scene.layout.AnchorPane;
+        import javafx.stage.Stage;
 
         import java.io.BufferedReader;
         import java.io.IOException;
+        import java.io.PrintWriter;
 
 public class AddAssetController {
 
@@ -41,6 +49,15 @@ public class AddAssetController {
     private Button saveButton;
     @FXML
     private Button clearButton;
+    private FixedAsset selectedAsset;
+
+    private CalculateAmortizationController calculateAmortizationController;
+    public void setCalculateAmortizationController(CalculateAmortizationController calcController) {
+        this.calculateAmortizationController = calcController;
+        System.out.println("CalculateAmortizationController установлен: " + (calcController != null));
+    }
+
+
 
     private Gson gson = new Gson();
 
@@ -86,11 +103,12 @@ public class AddAssetController {
         String depreciationMethod = depreciationMethodComboBox.getValue();
         String category = categoryComboBox.getValue();
 
-        return new FixedAsset(0, name, inventoryNumber, purchaseDate, initialCost, usefulLife, residualValue, depreciationMethod, category);
+        return new FixedAsset(name, inventoryNumber, purchaseDate, initialCost, usefulLife, residualValue, depreciationMethod, category);
     }
 
     private void saveAssetToDatabase(FixedAsset asset) throws Exception {
-        // Create the request to save the asset
+        System.out.println("Перед отправкой: id = " + asset.getId());
+
         Request request = new Request();
         request.setRequestType(RequestType.ADD_ASSET);
         request.setMessage(new Gson().toJson(asset));
@@ -99,15 +117,22 @@ public class AddAssetController {
         ClientSocket.getInstance().getOut().println(jsonRequest);
         ClientSocket.getInstance().getOut().flush();
 
-        handleServerResponse();
+        handleServerResponse(asset);
+
+        System.out.println("После ответа от сервера: id = " + asset.getId());
     }
 
-    private void handleServerResponse() {
+    private void handleServerResponse(FixedAsset asset) {
         try {
             BufferedReader in = ClientSocket.getInstance().getIn();
             String responseLine = in.readLine();
             if (responseLine != null) {
                 Response response = new Gson().fromJson(responseLine, Response.class);
+                if (response.getSuccess()) {
+                    // Убедитесь, что id корректно передается в ответе
+                    asset.setId(response.getId()); // Устанавливаем id из ответа
+                    System.out.println("Получено id от сервера: " + asset.getId());
+                }
                 showAlert("Ответ от сервера", response.getMessage());
             }
         } catch (IOException e) {
@@ -115,6 +140,106 @@ public class AddAssetController {
             showAlert("Ошибка", "Ошибка при получении ответа от сервера: " + e.getMessage());
         }
     }
+
+    private void calculateDepreciation(FixedAsset asset) throws Exception {
+        // Create a custom object to send the assetId and depreciation method
+        JsonObject requestObject = new JsonObject();
+        requestObject.addProperty("assetId", asset.getId());
+        requestObject.addProperty("method", depreciationMethodComboBox.getValue());
+
+        Request request = new Request();
+        request.setRequestType(RequestType.CALCULATE_AMORTIZATION);
+        request.setMessage(requestObject.toString());
+
+        String jsonRequest = new Gson().toJson(request);
+        ClientSocket.getInstance().getOut().println(jsonRequest);
+        ClientSocket.getInstance().getOut().flush();
+
+        handleAmortizationResponse();
+    }
+
+    private void handleAmortizationResponse() {
+        try {
+
+            BufferedReader in = ClientSocket.getInstance().getIn();
+            String responseLine = in.readLine();
+            if (responseLine != null) {
+                Response response = new Gson().fromJson(responseLine, Response.class);
+                if (response.getSuccess()) {
+                    JsonArray amortizationResults = new Gson().fromJson(response.getMessage(), JsonArray.class);
+                    showAlert("Ответ от сервера", response.getMessage());
+
+                    // Pass the result to CalculateAmortizationController
+                    CalculateAmortizationController calcController = new CalculateAmortizationController();
+                    calcController.setSelectedAsset(selectedAsset);
+                    calcController.displayAmortizationResults(amortizationResults);
+                } else {
+                    showAlert("Ошибка", "Ошибка при расчете амортизации: " + response.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Ошибка при получении ответа от сервера: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleCalculateDepreciationButtonAction() throws Exception {
+        FixedAsset asset = createFixedAssetFromInput();
+        saveAssetToDatabase(asset);
+        System.out.println(asset);
+
+        String selectedMethod = asset.getDepreciationMethod();
+
+        // Формируем объект запроса для отправки данных на сервер
+        JsonObject searchJson = new JsonObject();
+        searchJson.addProperty("assetId", asset.getId());
+        searchJson.addProperty("method", selectedMethod);
+
+        Request request = new Request();
+        request.setRequestType(RequestType.CALCULATE_AMORTIZATION);
+        request.setMessage(searchJson.toString());
+
+        try {
+            // Отправляем запрос на сервер для расчета амортизации
+            PrintWriter out = ClientSocket.getInstance().getOut();
+            out.println(gson.toJson(request));
+            out.flush();
+
+            // Читаем и обрабатываем ответ от сервера
+            BufferedReader in = ClientSocket.getInstance().getIn();
+            String responseString = in.readLine();
+            Response response = gson.fromJson(responseString, Response.class);
+
+            if (response.getSuccess()) {
+                JsonArray amortizationResults = gson.fromJson(response.getMessage(), JsonArray.class);
+                Platform.runLater(() -> {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("CalculateAmortization.fxml"));
+                        Parent root = loader.load();
+
+                        CalculateAmortizationController calculateAmortizationController = loader.getController();
+
+                        calculateAmortizationController.displayAmortizationResults(amortizationResults);
+
+                        Stage stage = new Stage();
+                        stage.setTitle("Результаты амортизации");
+                        stage.setScene(new Scene(root));
+                        stage.show();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        showAlert("Ошибка", "Не удалось загрузить окно амортизации.");
+                    }
+                });
+            } else {
+                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private void clearFields() {
         nameField.clear();
@@ -139,4 +264,3 @@ public class AddAssetController {
         alert.showAndWait();
     }
 }
-

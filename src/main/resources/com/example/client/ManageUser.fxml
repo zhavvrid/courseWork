@@ -11,11 +11,10 @@
         <!-- Заголовок -->
         <Button layoutX="172.0" layoutY="14.0" style="-fx-font-size: 28; -fx-background-color: transparent; -fx-text-fill: #f2ecec;" text="Управление учетными записями" />
 
-        <!-- Таблица для отображения учетных записей -->
         <TableView fx:id="accountTable" layoutX="20.0" layoutY="70.0" prefHeight="400.0" prefWidth="760.0" style="-fx-font-size: 14;">
             <columns>
                 <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
-                <TableColumn fx:id="usernameColumn" prefWidth="150.0" text="Имя пользователя" />
+                <TableColumn fx:id="roleColumn" prefWidth="150.0" text="Роль" />
                 <TableColumn fx:id="loginColumn" prefWidth="150.0" text="Логин" />
                 <TableColumn fx:id="passwordColumn" prefWidth="150.0" text="Пароль" />
                 <TableColumn fx:id="emailColumn" prefWidth="250.0" text="Email" />

@@ -47,6 +47,20 @@ public class AdminMenuController {
         }
     }
 
+    @FXML
+    private void openManageAccountWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ManageUser.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось открыть панель управления основными средствами.");
+        }
+    }
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

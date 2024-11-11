@@ -1,18 +1,20 @@
 package com.example.client;
 
 import com.example.client.Enums.RequestType;
+import com.example.client.Models.Entities.AmortizationResult;
+import com.example.client.Models.Entities.DepreciationCalculation;
 import com.example.client.Models.Entities.FixedAsset;
 import com.example.client.Models.TCP.Request;
 import com.example.client.Models.TCP.Response;
 import com.example.client.Utility.ClientSocket;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -76,10 +78,6 @@ public class FixedAssetController {
     @FXML
     private ComboBox<String> searchParameterComboBox;
     @FXML
-    private ComboBox<String> sortParameterComboBox;
-    @FXML
-    private ComboBox<String> sortDirectionComboBox;
-    @FXML
     private Button sortButton;
 
     private Gson gson = new Gson();
@@ -88,15 +86,9 @@ public class FixedAssetController {
     private void initialize() {
         setupTableColumns();
         loadAssets();
+
         searchParameterComboBox.getItems().addAll("Название", "Инвентарный номер", "Категория", "Метод амортизации");
         searchParameterComboBox.setValue("Название");
-
-        sortParameterComboBox.getItems().addAll("Название", "Начальная стоимость", "Срок полезного использования", "Ликвидационная стоимость", "Категория");
-        sortParameterComboBox.setValue("Название");
-
-        // Добавляем варианты направления сортировки
-        sortDirectionComboBox.getItems().addAll("По возрастанию", "По убыванию");
-        sortDirectionComboBox.setValue("По возрастанию");
     }
 
     @FXML
@@ -114,6 +106,7 @@ public class FixedAssetController {
     }
 
     public void loadAssets() {
+        ObservableList<FixedAsset> assetsList = FXCollections.observableArrayList();
         Request request = new Request();
         request.setRequestType(RequestType.GETALL_ASSET);
 
@@ -129,13 +122,15 @@ public class FixedAssetController {
             System.out.println("Response string: " + responseString);
 
             if (response.getSuccess()) {
-                // Извлекаем message
                 String message = response.getMessage();
-
-                // Пробуем разобрать message как JSON-строку, содержащую массив
                 try {
-                    List<FixedAsset> assets = gson.fromJson(message, new TypeToken<List<FixedAsset>>() {}.getType());
-                    Platform.runLater(() -> assetsTable.getItems().setAll(assets));
+                    List<FixedAsset> assets = gson.fromJson(message, new TypeToken<List<FixedAsset>>() {
+                    }.getType());
+                    Platform.runLater(() -> {
+                        assetsTable.getItems().setAll(assets);
+                        assetsList.setAll(assets);
+
+                    });
                 } catch (JsonSyntaxException e) {
                     // Обработка ошибки разбора JSON
                     Platform.runLater(() -> showAlert("Ошибка", "Неправильный формат данных: " + message));
@@ -173,13 +168,11 @@ public class FixedAssetController {
                 Stage stage = new Stage();
                 stage.setTitle("Редактирование основного средства");
 
-                // Pass the selected asset and this controller instance
                 EditAssetController editController = loader.getController();
-                editController.setAsset(selectedAsset, this); // Pass the current controller
+                editController.setAsset(selectedAsset, this);
 
                 stage.setScene(new Scene(root));
                 stage.showAndWait();
-                // No need to call loadAssets() here anymore since it's done in EditAssetController
             } catch (IOException e) {
                 e.printStackTrace();
                 showAlert("Ошибка", "Не удалось открыть окно редактирования.");
@@ -195,10 +188,19 @@ public class FixedAssetController {
         FixedAsset selectedAsset = assetsTable.getSelectionModel().getSelectedItem();
         if (selectedAsset != null) {
             sendDeleteRequest(selectedAsset.getId());
-            loadAssets(); // Refresh the asset list after deletion
+            loadAssets();
         } else {
             showAlert("Ошибка", "Не выбран актив для удаления.");
         }
+    }
+    private void sendDeleteRequest(int assetId) {
+        Request request = new Request();
+        request.setRequestType(RequestType.DELETE_ASSET);
+        request.setMessage(String.valueOf(assetId));
+
+        PrintWriter out = ClientSocket.getInstance().getOut();
+        out.println(gson.toJson(request));
+        out.flush();
     }
 
     private void sendUpdateRequest(FixedAsset asset) {
@@ -211,15 +213,7 @@ public class FixedAssetController {
         out.flush();
     }
 
-    private void sendDeleteRequest(int assetId) {
-        Request request = new Request();
-        request.setRequestType(RequestType.DELETE_ASSET);
-        request.setMessage(String.valueOf(assetId));
 
-        PrintWriter out = ClientSocket.getInstance().getOut();
-        out.println(gson.toJson(request));
-        out.flush();
-    }
 
     @FXML
     private void searchAssets() {
@@ -231,15 +225,13 @@ public class FixedAssetController {
             return;
         }
 
-        // Создаем JSON-объект для параметров поиска
         JsonObject searchJson = new JsonObject();
         searchJson.addProperty("parameter", searchParameter);
         searchJson.addProperty("value", searchText);
 
-        // Создаем запрос на сервер, устанавливаем тип запроса и сообщение с параметрами поиска
         Request request = new Request();
         request.setRequestType(RequestType.SEARCH_ASSET);
-        request.setMessage(searchJson.toString()); // Передаем параметры поиска в формате JSON
+        request.setMessage(searchJson.toString());
 
         try {
             PrintWriter out = ClientSocket.getInstance().getOut();
@@ -251,8 +243,8 @@ public class FixedAssetController {
             Response response = gson.fromJson(responseString, Response.class);
 
             if (response.getSuccess()) {
-                // Обрабатываем полученные результаты
-                List<FixedAsset> filteredAssets = gson.fromJson(response.getMessage(), new TypeToken<List<FixedAsset>>() {}.getType());
+                List<FixedAsset> filteredAssets = gson.fromJson(response.getMessage(), new TypeToken<List<FixedAsset>>() {
+                }.getType());
                 Platform.runLater(() -> assetsTable.getItems().setAll(filteredAssets));
             } else {
                 Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
@@ -263,18 +255,39 @@ public class FixedAssetController {
         }
     }
 
-    @FXML
-    private void sortAssets() {
-        String sortParameter = sortParameterComboBox.getValue();
-        String sortDirection = sortDirectionComboBox.getValue();
 
-        JsonObject sortJson = new JsonObject();
-        sortJson.addProperty("parameter", sortParameter);
-        sortJson.addProperty("direction", sortDirection.equals("По возрастанию") ? "ASC" : "DESC");
+    @FXML
+    private void openDepreciationCalculationWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("CalculateAmortization.fxml"));
+            Parent root = loader.load();
+
+            // Получаем выбранный актив
+            FixedAsset selectedAsset = assetsTable.getSelectionModel().getSelectedItem();
+            if (selectedAsset == null) {
+                showAlert("Ошибка", "Необходимо выбрать актив для расчета амортизации.");
+                return;
+            }
+
+            // Устанавливаем актив в контроллер расчета амортизации
+            CalculateAmortizationController controller = loader.getController();
+            controller.setSelectedAsset(selectedAsset); // Вызовет расчет амортизации и обновит таблицу
+
+            // Открываем окно расчета
+            Stage stage = new Stage();
+            stage.setTitle("Рассчитать амортизацию");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void loadAmortization() {
 
         Request request = new Request();
-        request.setRequestType(RequestType.SORT_ASSET);
-        request.setMessage(sortJson.toString());
+        request.setRequestType(RequestType.GETALL_AMORTIZATION);
 
         try {
             PrintWriter out = ClientSocket.getInstance().getOut();
@@ -286,50 +299,35 @@ public class FixedAssetController {
             Response response = gson.fromJson(responseString, Response.class);
 
             if (response.getSuccess()) {
-                List<FixedAsset> sortedAssets = gson.fromJson(response.getMessage(), new TypeToken<List<FixedAsset>>() {}.getType());
-                Platform.runLater(() -> assetsTable.getItems().setAll(sortedAssets));
+                JsonArray amortizationResults = gson.fromJson(response.getMessage(), JsonArray.class);
+                Platform.runLater(() -> {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("CalculateAmortization.fxml"));
+                        Parent root = loader.load();
+
+                        CalculateAmortizationController calculateAmortizationController = loader.getController();
+
+                        calculateAmortizationController.displayAmortizationResults(amortizationResults);
+
+                        Stage stage = new Stage();
+                        stage.setTitle("Результаты амортизации");
+                        stage.setScene(new Scene(root));
+                        stage.show();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        showAlert("Ошибка", "Не удалось загрузить окно амортизации.");
+                    }
+                });
             } else {
                 Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Ошибка", "Не удалось выполнить сортировку: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
-     @FXML
-    private void openDepreciationCalculationWindow() {
-        FixedAsset selectedAsset = assetsTable.getSelectionModel().getSelectedItem();
 
-        if (selectedAsset == null) {
-            showAlert("Ошибка", "Пожалуйста, выберите актив для расчета амортизации.");
-            return;
-        }
 
-        String selectedMethod = selectedAsset.getDepreciationMethod();
-
-        try {
-            // Загружаем FXML для окна расчета амортизации
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("DepreciationCalculationWindow.fxml"));
-            Parent root = loader.load();
-
-            // Получаем контроллер окна расчета амортизации
-            DepreciationCalculationController controller = loader.getController();
-
-            // Передаем метод амортизации в контроллер второго окна
-            controller.setDepreciationMethod(selectedMethod);
-
-            // Настраиваем новое окно
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Расчет амортизации");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Ошибка", "Не удалось открыть окно расчета амортизации.");
-        }
-    }
 
 
 
