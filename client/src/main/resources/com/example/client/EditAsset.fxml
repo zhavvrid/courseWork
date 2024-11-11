@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.client.EditAssetController">
+    <Label text="Название:" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="nameField" AnchorPane.topAnchor="30" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Инвентарный номер:" AnchorPane.topAnchor="70" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="inventoryNumberField" AnchorPane.topAnchor="90" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Дата покупки:" AnchorPane.topAnchor="130" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="purchaseDateField" AnchorPane.topAnchor="150" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Начальная стоимость:" AnchorPane.topAnchor="190" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="initialCostField" AnchorPane.topAnchor="210" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Срок полезного использования:" AnchorPane.topAnchor="250" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="usefulLifeField" AnchorPane.topAnchor="270" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Ликвидационная стоимость:" AnchorPane.topAnchor="310" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="residualValueField" AnchorPane.topAnchor="330" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Метод амортизации:" AnchorPane.topAnchor="370" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="depreciationMethodField" AnchorPane.topAnchor="390" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Label text="Категория:" AnchorPane.topAnchor="430" AnchorPane.leftAnchor="10"/>
+    <TextField fx:id="categoryField" AnchorPane.topAnchor="450" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"/>
+
+    <Button text="Сохранить" onAction="#saveAsset" AnchorPane.topAnchor="500" AnchorPane.leftAnchor="10"/>
+    <Button text="Отмена" onAction="#cancel" AnchorPane.topAnchor="500" AnchorPane.leftAnchor="100"/>
+</AnchorPane>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+
+    <!-- JDBC Database connection settings -->
+    <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/bd</property>
+    <property name="hibernate.connection.username">root</property>
+    <property name="hibernate.connection.password">SvetlanaZhavrid12345678_</property>
+
+
+    <!-- Display the generated SQL statements -->
+    <property name="hibernate.show_sql">true</property>
+    <property name="hibernate.format_sql">true</property>
+
+
+    <!-- Update the schema when necessary -->
+    <property name="hibernate.hbm2ddl.auto">update</property>
+    <mapping resource="mapping.xml"/>
+    <mapping class="com.example.server.Models.Entities.User"/>
+    <mapping class="com.example.server.Models.Entities.Role"/>
+    <mapping class="com.example.server.Models.Entities.FixedAsset"/>
+  </session-factory>
+</hibernate-configuration>

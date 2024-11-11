@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+                                     http://xmlns.jcp.org/xml/ns/persistence/orm_2_0.xsd"
+                 version="2.1">
+
+    <!-- Маппинг для сущности User -->
+    <entity class="com.example.server.Models.Entities.User" name="User">
+        <table name="users"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="login">
+                <column name="login" unique="true" nullable="false"/>
+            </basic>
+            <basic name="password">
+                <column name="password" nullable="false"/>
+            </basic>
+            <basic name="email">
+                <column name="email" unique="true" nullable="false"/>
+            </basic>
+            <many-to-one name="role" fetch="LAZY">
+                <join-column name="role_id" nullable="false"/>
+            </many-to-one>
+        </attributes>
+    </entity>
+
+    <!-- Маппинг для сущности Role -->
+    <entity class="com.example.server.Models.Entities.Role" name="Role">
+        <table name="role"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </basic>
+            <one-to-many name="users" mapped-by="role" fetch="LAZY"/>
+        </attributes>
+    </entity>
+
+    <!-- Маппинг для сущности FixedAsset -->
+    <entity class="com.example.server.Models.Entities.FixedAsset" name="FixedAsset">
+        <table name="fixed_asset"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name">
+                <column name="name" nullable="false"/>
+            </basic>
+            <basic name="inventoryNumber">
+                <column name="inventoryNumber" unique="true" nullable="false"/>
+            </basic>
+            <basic name="category">
+                <column name="category"/>
+            </basic>
+            <basic name="initialCost">
+                <column name="initialCost" nullable="false"/>
+            </basic>
+            <basic name="residualValue">
+                <column name="residualValue"/>
+            </basic>
+            <basic name="usefulLife">
+                <column name="usefulLife"/>
+            </basic>
+            <basic name="purchaseDate">
+                <column name="purchaseDate"/>
+            </basic>
+            <basic name="depreciationMethod">
+                <column name="depreciationMethod"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <!-- Маппинг для сущности DepreciationCalculation -->
+    <entity class="com.example.server.Models.Entities.DepreciationCalculation" name="DepreciationCalculation">
+        <table name="depreciationcalculation"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="calculationDate">
+                <column name="calculationDate"/>
+            </basic>
+            <basic name="depreciationAmount">
+                <column name="depreciationamount"/>
+            </basic>
+            <basic name="accumulatedDepreciation">
+                <column name="accumulatedDepreciation"/>
+            </basic>
+            <basic name="residualValue">
+                <column name="residualValue"/>
+            </basic>
+            <basic name="depreciationMethod">
+                <column name="depreciation_method"/>
+            </basic>
+            <basic name="initialCost">
+                <column name="initial_cost"/>
+            </basic>
+            <many-to-one name="fixedAsset">
+                <join-column name="asset_id" nullable="false"/>
+            </many-to-one>
+
+        </attributes>
+    </entity>
+
+</entity-mappings>

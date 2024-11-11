@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<AnchorPane prefHeight="600.0" prefWidth="1200.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.CalculateAmortizationController">
+    <children>
+
+        <HBox layoutX="20.0" layoutY="10.0" spacing="10">
+            <DatePicker fx:id="startDatePicker" promptText="Дата начала"/>
+            <DatePicker fx:id="endDatePicker" promptText="Дата окончания"/>
+            <Button text="Применить фильтр" onAction="#filterByDateRange"/>
+        </HBox>
+
+        <HBox layoutX="20.0" layoutY="20.0" spacing="10" />
+
+        <TableView fx:id="depreciationTable" layoutX="20.0" layoutY="50.0" prefHeight="500.0" prefWidth="1160.0">
+            <columns>
+                <TableColumn fx:id="rowNumberColumn" text="№" />
+                <TableColumn fx:id="nameColumn" text="Название актива" />
+                <TableColumn fx:id="inventoryNumberColumn" text="Инвентарный номер" />
+                <TableColumn fx:id="depreciationMethodColumn" text="Метод амортизации" />
+                <TableColumn fx:id="initialCostColumn" text="Начальная стоимость" />
+                <TableColumn fx:id="usefulLifeColumn" text="Срок полезного использования" />
+                <TableColumn fx:id="purchaseDateColumn" text="Дата покупки" />
+                <TableColumn fx:id="depreciationCalculationDateColumn" text="Дата на которую рассчитывается амортизация" />
+                <TableColumn fx:id="residualValueCol" text="Ликвидационная стоимость" />
+                <TableColumn fx:id="depreciationAmountColumn" text="Сумма амортизации" />
+                <TableColumn fx:id="accumulatedDepreciationColumn" text="Накопленная амортизация" />
+                <TableColumn fx:id="residualValueColumn" text="Остаточная стоимость" />
+            </columns>
+        </TableView>
+
+        <HBox layoutX="20.0" layoutY="560.0" spacing="10">
+            <children>
+                <Button fx:id="exportButton" style="-fx-background-color: #FF5722; -fx-text-fill: white;" text="Экспорт в Excel" />
+                <Button fx:id="generateReportButton"  onAction="#generateReport" prefHeight="25.0" prefWidth="100.0" style="-fx-background-color: #FF9800; -fx-text-fill: white;" text="Создать отчет" />
+            <Button mnemonicParsing="false" onAction="#loadAmortization" prefHeight="25.0" prefWidth="99.0" text="Вывести все активы" />
+            </children>
+        </HBox>
+
+    </children>
+</AnchorPane>

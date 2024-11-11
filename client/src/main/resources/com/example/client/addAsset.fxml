@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="700.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.AddAssetController">
+    <children>
+        <AnchorPane focusTraversable="true" layoutY="100.0" prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: #fafafa;">
+            <children>
+                <TextField fx:id="nameField" layoutX="50.0" layoutY="30.0" prefHeight="25.0" prefWidth="300.0" promptText="Название ОС" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <TextField fx:id="inventoryNumberField" layoutX="370.0" layoutY="30.0" prefHeight="25.0" prefWidth="280.0" promptText="Инвентарный номер" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <DatePicker fx:id="purchaseDatePicker" layoutX="50.0" layoutY="80.0" prefHeight="25.0" prefWidth="300.0" promptText="Дата приобретения" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <TextField fx:id="initialCostField" layoutX="370.0" layoutY="80.0" prefHeight="25.0" prefWidth="280.0" promptText="Первоначальная стоимость" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <TextField fx:id="usefulLifeField" layoutX="50.0" layoutY="130.0" prefHeight="25.0" prefWidth="300.0" promptText="Срок полезного использования (лет)" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <TextField fx:id="residualValueField" layoutX="370.0" layoutY="130.0" prefHeight="25.0" prefWidth="280.0" promptText="Остаточная стоимость" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <ComboBox fx:id="depreciationMethodComboBox" layoutX="50.0" layoutY="180.0" prefHeight="25.0" prefWidth="300.0" promptText="Метод амортизации" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <ComboBox fx:id="categoryComboBox" layoutX="370.0" layoutY="180.0" prefHeight="25.0" prefWidth="280.0" promptText="Категория ОС" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5; -fx-font-size: 16;" />
+
+                <Button fx:id="calculateDepreciationButton" layoutX="213.0" layoutY="281.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleCalculateDepreciationButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #3F51B5; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Рассчитать амортизацию" />
+                <Button fx:id="saveButton" layoutX="214.0" layoutY="340.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleSaveButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #4CAF50; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Сохранить" />
+
+                <Button fx:id="clearButton" layoutX="213.0" layoutY="400.0" minHeight="25.0" mnemonicParsing="false" onAction="#handleClearButtonAction" prefHeight="40.0" prefWidth="288.0" style="-fx-background-color: #FF7043; -fx-font-size: 17; -fx-text-fill: WHITE;" text="Очистить" />
+            </children>
+        </AnchorPane>
+
+        <Label layoutX="217.0" layoutY="26.0" style="-fx-font-size: 30; -fx-font-family: 'Yu Gothic UI Semibold';" text="Учет амортизации" textFill="#f2ecec" wrapText="true" />
+    </children>
+</AnchorPane>
