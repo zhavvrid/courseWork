@@ -20,10 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -34,6 +31,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class CalculateAmortizationController {
 
@@ -159,8 +157,6 @@ public class CalculateAmortizationController {
     }
 
 
-
-
     @FXML
     public void calculateAmortization() {
         if (selectedAsset == null) {
@@ -172,6 +168,16 @@ public class CalculateAmortizationController {
         JsonObject searchJson = new JsonObject();
         searchJson.addProperty("assetId", selectedAsset.getId());
         searchJson.addProperty("method", selectedMethod);
+
+        // Если выбран метод "Метод остаточной стоимости", получаем ставку амортизации от пользователя
+        if ("Метод остаточной стоимости".equals(selectedMethod)) {
+            BigDecimal depreciationRate = getDepreciationRateFromUser();
+            if (depreciationRate == null) {
+                showAlert("Ошибка", "Неверно введена ставка амортизации.");
+                return; // Если ставка не введена, выходим
+            }
+            searchJson.addProperty("depreciationRate", depreciationRate.toString());
+        }
 
         Request request = new Request();
         request.setRequestType(RequestType.CALCULATE_AMORTIZATION);
@@ -198,6 +204,26 @@ public class CalculateAmortizationController {
             showAlert("Ошибка", "Не удалось выполнить расчет амортизации: " + e.getMessage());
         }
     }
+
+    // Метод для отображения диалога ввода ставки амортизации
+    private BigDecimal getDepreciationRateFromUser() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Введите ставку амортизации");
+        dialog.setHeaderText("Введите ставку амортизации для метода остаточной стоимости.");
+        dialog.setContentText("Ставка амортизации:");
+
+        // Отображаем диалог и получаем результат
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                return new BigDecimal(result.get());
+            } catch (NumberFormatException e) {
+                showAlert("Ошибка", "Неверный формат ставки амортизации.");
+            }
+        }
+        return null; // Если ставка не введена или введена неверно
+    }
+
 
 
     @FXML
@@ -242,5 +268,8 @@ public class CalculateAmortizationController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void setDepreciationRate(BigDecimal depreciationRate) {
     }
 }

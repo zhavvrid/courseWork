@@ -69,7 +69,7 @@ public class AddAssetController {
         categoryComboBox.setItems(categories);
 
         ObservableList<String> depreciationMethods = FXCollections.observableArrayList(
-                "Линейный", "Ускоренный", "Производственный"
+                "Линейный", "Ускоренный", "Метод остаточной стоимости"
         );
         depreciationMethodComboBox.setItems(depreciationMethods);
     }
