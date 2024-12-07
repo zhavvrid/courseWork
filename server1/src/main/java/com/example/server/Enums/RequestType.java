@@ -13,6 +13,7 @@ public enum RequestType {
     CALCULATE_AMORTIZATION,
     GETALL_AMORTIZATION,
     ADD_ROLE,
+    SAVE_REPORT,
     DELETE_ROLE,
     GET_ROLE,
     GETALL_ROLES,
@@ -21,5 +22,8 @@ public enum RequestType {
     DELETE_USER,
     GET_USER,
     GETALL_USERS,
-    UPDATE_USER
+    UPDATE_USER,
+    SEND_MESSAGE,
+    GET_MESSAGES,
+    MARK_AS_READ
 }

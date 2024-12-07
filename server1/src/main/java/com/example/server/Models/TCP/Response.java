@@ -1,10 +1,21 @@
 package com.example.server.Models.TCP;
 
 import com.example.server.Enums.RequestType;
+import com.example.server.Models.Entities.User;
 
 public class Response {
     private String message;
     private int id;
+
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public int getId() {
         return id;

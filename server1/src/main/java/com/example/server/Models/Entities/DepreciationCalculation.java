@@ -22,6 +22,8 @@ public class DepreciationCalculation {
     @JoinColumn(name = "asset_id", nullable = false)
     private FixedAsset fixedAsset;
 
+
+
     private String calculationDate; // Дата расчета
     private BigDecimal depreciationAmount; // Сумма амортизации за период
     private BigDecimal accumulatedDepreciation; // Накопленная амортизация

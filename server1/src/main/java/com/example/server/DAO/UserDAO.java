@@ -1,7 +1,9 @@
 package com.example.server.DAO;
 
 import com.example.server.Interfaces.DAO;
+import com.example.server.Models.Entities.Role;
 import com.example.server.Models.Entities.User;
+import com.example.server.Utility.HibernateUtil;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -30,19 +32,20 @@ public class UserDAO implements DAO<User> {
             e.printStackTrace();
         }
     }
-
-    @Override
+@Override
     public void update(User user) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.update(user);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        }
+    Transaction transaction = null;
+    try (Session session = sessionFactory.openSession()) {
+        transaction = session.beginTransaction();
+        session.update(user);
+        transaction.commit();
+    } catch (Exception e) {
+        if (transaction != null) transaction.rollback();
+        e.printStackTrace();
     }
+    }
+
+
 
     @Override
     public void delete(int id) {
@@ -63,12 +66,16 @@ public class UserDAO implements DAO<User> {
     @Override
     public User find(int id) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(User.class, id);
+            String hql = "FROM User u LEFT JOIN FETCH u.role WHERE u.id = :id";
+            return session.createQuery(hql, User.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+
 
     @Override
     public List<User> findAll() {
@@ -83,17 +90,19 @@ public class UserDAO implements DAO<User> {
         }
     }
 
-
-
-
-    public User findByLogin(String login) {
+    public User   findByLogin(String login) {
         Transaction transaction = null;
         User user = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Query<User> query = session.createQuery("from User u left join fetch u.role where u.login = :login", User.class);
+            Query<User> query = session.createQuery(
+                    "from User u left join fetch u.role where u.login = :login", User.class);
             query.setParameter("login", login);
             user = query.uniqueResult();
+            if (user != null) {
+                // Force initialization of the role to prevent lazy loading issues
+                Hibernate.initialize(user.getRole());
+            }
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -101,4 +110,5 @@ public class UserDAO implements DAO<User> {
         }
         return user;
     }
+
 }

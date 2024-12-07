@@ -14,7 +14,6 @@ public class RoleSerializer implements JsonSerializer<Role> {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("id", role.getId());
         jsonObject.addProperty("name", role.getName());
-        // Do not add users to prevent circular reference
         return jsonObject;
     }
 }

@@ -22,13 +22,12 @@
             <basic name="email">
                 <column name="email" unique="true" nullable="false"/>
             </basic>
-            <many-to-one name="role" fetch="LAZY">
+            <many-to-one name="role">
                 <join-column name="role_id" nullable="false"/>
             </many-to-one>
         </attributes>
     </entity>
 
-    <!-- Маппинг для сущности Role -->
     <entity class="com.example.server.Models.Entities.Role" name="Role">
         <table name="role"/>
         <attributes>
@@ -39,11 +38,11 @@
             <basic name="name">
                 <column name="name" unique="true" nullable="false"/>
             </basic>
-            <one-to-many name="users" mapped-by="role" fetch="LAZY"/>
+            <one-to-many name="users" mapped-by="role"/>
         </attributes>
     </entity>
 
-    <!-- Маппинг для сущности FixedAsset -->
+
     <entity class="com.example.server.Models.Entities.FixedAsset" name="FixedAsset">
         <table name="fixed_asset"/>
         <attributes>
@@ -78,7 +77,6 @@
         </attributes>
     </entity>
 
-    <!-- Маппинг для сущности DepreciationCalculation -->
     <entity class="com.example.server.Models.Entities.DepreciationCalculation" name="DepreciationCalculation">
         <table name="depreciationcalculation"/>
         <attributes>
@@ -90,7 +88,7 @@
                 <column name="calculationDate"/>
             </basic>
             <basic name="depreciationAmount">
-                <column name="depreciationamount"/>
+                <column name="depreciationAmount"/>
             </basic>
             <basic name="accumulatedDepreciation">
                 <column name="accumulatedDepreciation"/>
@@ -107,8 +105,98 @@
             <many-to-one name="fixedAsset">
                 <join-column name="asset_id" nullable="false"/>
             </many-to-one>
-
         </attributes>
     </entity>
 
+    <entity class="com.example.server.Models.Entities.StraightLineDepreciation" name="StraightLineDepreciation">
+        <table name="straightlinedepreciation"/>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="annualDepreciation">
+                <column name="annualDepreciation"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="com.example.server.Models.Entities.AcceleratedDepreciation" name="AcceleratedDepreciation">
+        <table name="accelerateddepreciation"/>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="depreciationRate">
+                <column name="depreciationRate"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="com.example.server.Models.Entities.DecliningBalanceDepreciation" name="DecliningBalanceDepreciation">
+        <table name="decliningbalancedepreciation"/>
+        <inheritance strategy="JOINED"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="depreciationRate">
+                <column name="depreciationRate"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="com.example.server.Models.Entities.Report" name="Report">
+        <table name="reports"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="reportType">
+                <column name="report_type"/>
+            </basic>
+            <basic name="content">
+                <column name="content"/>
+            </basic>
+            <basic name="createdDate">
+                <column name="created_date" />
+            </basic>
+            <many-to-one name="createdBy">
+                <join-column name="created_by_user_id" nullable="false"/>
+            </many-to-one>
+        </attributes>
+    </entity>
+
+    <entity class="com.example.server.Models.Entities.Message" name="Message">
+        <table name="messages"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="content">
+                <column name="content" nullable="false"/>
+            </basic>
+
+            <basic name="timestamp">
+                <column name="timestamp"/>
+            </basic>
+            <basic name="isReadStatus">
+                <column name="is_read" column-definition="BOOLEAN DEFAULT FALSE"/>
+            </basic>
+            <many-to-one name="sender">
+                <join-column name="sender_id" referenced-column-name="id" nullable="false"/>
+            </many-to-one>
+
+            <many-to-one name="receiver">
+                <join-column name="receiver_id" referenced-column-name="id" nullable="false"/>
+            </many-to-one>
+
+
+        </attributes>
+    </entity>
 </entity-mappings>

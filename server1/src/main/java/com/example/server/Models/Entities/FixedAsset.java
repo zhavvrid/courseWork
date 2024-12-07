@@ -2,6 +2,7 @@ package com.example.server.Models.Entities;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "fixed_asset")
@@ -29,6 +30,9 @@ public class FixedAsset {
     private String purchaseDate; // Change LocalDate to String
 
     private String depreciationMethod;
+    @OneToMany(mappedBy = "fixedAsset", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<DepreciationCalculation> depreciationCalculations;
+
 
     public FixedAsset() {
     }

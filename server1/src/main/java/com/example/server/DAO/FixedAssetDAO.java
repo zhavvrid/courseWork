@@ -52,16 +52,21 @@ public class FixedAssetDAO implements DAO<FixedAsset> {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
+
             FixedAsset fixedAsset = session.get(FixedAsset.class, id);
+
             if (fixedAsset != null) {
                 session.delete(fixedAsset);
             }
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
+
 
     @Override
     public FixedAsset find(int id) {
@@ -148,7 +153,6 @@ public class FixedAssetDAO implements DAO<FixedAsset> {
                     throw new IllegalArgumentException("Неизвестный параметр: " + parameter);
             }
 
-            // Apply sorting order to query
             query.select(root).orderBy(sortOrder);
             return session.createQuery(query).getResultList();
         } catch (Exception e) {
