@@ -21,7 +21,7 @@
                         <Font size="36.0" />
                     </font>
                 </Label>
-                <Button fx:id="authSignInButton" layoutX="301.0" layoutY="210.0" minHeight="21.0" mnemonicParsing="false" onAction="#authSignInPressed" prefHeight="37.0" prefWidth="125.0" style="-fx-background-color: #F39C63;" text="Войти" textFill="WHITE">
+                <Button fx:id="authSignInButton" layoutX="301.0" layoutY="210.0" minHeight="21.0" mnemonicParsing="false" onAction="#authSignInPressed" prefHeight="45.0" prefWidth="145.0" style="-fx-background-color: #F39C63; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 4);" text="Войти" textFill="WHITE">
                     <font>
                         <Font size="20.0" />
                     </font>
@@ -31,13 +31,22 @@
                         <Font size="16.0" />
                     </font>
                 </PasswordField>
+              <Label layoutX="258.0" layoutY="266.0" style="-fx-font-size: 14;" text="Нет аккаунта? " textFill="#747171">
+                  <font>
+                      <Font size="14.0" />
+                  </font>
+              </Label>
+              <Label fx:id="loginSignUpButton" layoutX="348.0" layoutY="266.0" style="-fx-font-size: 14; -fx-underline: true; -fx-cursor: hand;" text="Зарегистрироваться" textFill="#F39C63">
+                  <font>
+                      <Font size="14.0" />
+                  </font>
+              </Label>
             </children>
         </AnchorPane>
-        <Label layoutX="251.0" layoutY="36.0" text="Учет амортизации" textFill="#f2ecec" wrapText="true">
+        <Label layoutX="58.0" layoutY="27.0" style="-fx-font-size: 32; -fx-font-weight: bold;" text="Учет амортизации основных средств" textFill="#F39C63" wrapText="true">
             <font>
-                <Font name="Arial Italic" size="25.0" />
+                <Font name="Arial" size="36.0" />
             </font>
         </Label>
-        <Button fx:id="loginSignUpButton" layoutX="518.0" layoutY="14.0" minHeight="21.0" mnemonicParsing="false" onAction="#SignUp_Pressed" prefHeight="37.0" prefWidth="167.0" style="-fx-background-color: #F39C63;" text="Зарегистрироваться" textFill="WHITE" />
     </children>
 </AnchorPane>

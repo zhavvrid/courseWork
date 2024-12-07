@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.client.MessageController"
+            prefHeight="400.0" prefWidth="600.0">
+    <AnchorPane prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+        <children>
+            <!-- Заголовок -->
+            <Label fx:id="profileLabel" layoutX="200.0" layoutY="14.0" style="-fx-font-size: 24; -fx-text-fill: #f2ecec;" text="Входящие сообщения" />
+
+            <!-- Список сообщений -->
+            <TableView fx:id="messagesTable" layoutX="20.0" layoutY="70.0" prefHeight="400.0" prefWidth="560.0">
+                <columns>
+                    <TableColumn fx:id="senderColumn" text="Отправитель" prefWidth="140.0" />
+                    <TableColumn fx:id="contentColumn" text="Сообщение" prefWidth="280.0" />
+                    <TableColumn fx:id="timestampColumn" text="Время" prefWidth="100.0" />
+                    <TableColumn fx:id="statusColumn" text="Статус" prefWidth="80.0" />
+                </columns>
+            </TableView>
+
+            <!-- Кнопка отметить прочитанным -->
+            <Button fx:id="markAsReadButton" layoutX="20.0" layoutY="490.0" prefWidth="180.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Отметить прочитанным" />
+
+            <!-- Кнопка назад -->
+            <Button fx:id="backButton" layoutX="490.0" layoutY="490.0" prefWidth="90.0" style="-fx-background-color: #F44336; -fx-text-fill: white;" text="Назад" />
+        </children>
+    </AnchorPane>
+
+
+</AnchorPane>

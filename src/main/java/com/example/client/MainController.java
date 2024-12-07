@@ -11,12 +11,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert;
 
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
@@ -34,7 +32,7 @@ public class MainController {
     private Button authSignInButton;
 
     @FXML
-    private Button loginSignUpButton;
+    private Label loginSignUpButton;
 
     @FXML
     private TextField login_field;
@@ -44,7 +42,7 @@ public class MainController {
 
     @FXML
     void initialize() {
-        loginSignUpButton.setOnAction(actionEvent -> openSignUpWindow());
+        loginSignUpButton.setOnMouseClicked(event -> openSignUpWindow());
     }
 
     private void openSignUpWindow() {
@@ -58,12 +56,19 @@ public class MainController {
             e.printStackTrace();
         }
     }
-    public void SignUp_Pressed(ActionEvent actionEvent) throws IOException{
-        Stage stage = (Stage) loginSignUpButton.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("signUp.fxml"));
-        Scene newScene = new Scene(root);
-        stage.setScene(newScene);
+    @FXML
+    private void SignUp_Pressed(MouseEvent event) {
+        try {
+
+            Stage stage = (Stage) ((javafx.scene.control.Label) event.getSource()).getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("signUp.fxml"));
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     @FXML
     public void authSignInPressed(ActionEvent actionEvent) {
         String login = login_field.getText();
@@ -74,22 +79,17 @@ public class MainController {
             return;
         }
 
-        // Создаем пользователя для отправки на сервер
         User user = new User();
         user.setLogin(login);
         user.setPassword(password);
-
-        // Создаем запрос на авторизацию
         Request request = new Request();
         request.setRequestType(RequestType.LOGIN);
         request.setMessage(new Gson().toJson(user));
 
-        // Отправляем запрос на сервер
         String jsonRequest = new Gson().toJson(request);
         ClientSocket.getInstance().getOut().println(jsonRequest);
         ClientSocket.getInstance().getOut().flush();
 
-        // Обрабатываем ответ от сервера
         handleServerResponse();
     }
 
@@ -99,10 +99,11 @@ public class MainController {
             String responseLine = in.readLine();
             if (responseLine != null) {
                 Response response = new Gson().fromJson(responseLine, Response.class);
-                showAlert("Ответ от сервера", response.getMessage());
-                // Если авторизация успешна, проверяем роль пользователя
+                showAlert("Результат", response.getMessage());
+                User authenticatedUser = response.getUser();
+                CurrentUser.getInstance().setUser(authenticatedUser);
                 if (response.getSuccess()) {
-                    openMainAppWindow(response.getRole()); // Pass the role to the method
+                    openMainAppWindow(response.getRole());
                 }
             }
         } catch (IOException e) {
@@ -118,10 +119,10 @@ public class MainController {
             if ("admin".equalsIgnoreCase(role)) {
                 root = FXMLLoader.load(getClass().getResource("AdminMenu.fxml"));
             } else if ("accountant".equalsIgnoreCase(role)) {
-                root = FXMLLoader.load(getClass().getResource("AccountantPanel.fxml")); // Add your accountant menu
+                root = FXMLLoader.load(getClass().getResource("AccountantPanel.fxml"));
             } else {
                 showAlert("Ошибка", "Неизвестная роль пользователя.");
-                return; // Exit if the role is unknown
+                return;
             }
             Scene scene = new Scene(root);
             stage.setScene(scene);

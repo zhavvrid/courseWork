@@ -46,6 +46,7 @@ public class EditAssetController {
             categoryField.setText(asset.getCategory());
         }
 
+
         @FXML
         private void saveAsset() {
             // Update asset with new values
@@ -59,8 +60,7 @@ public class EditAssetController {
             asset.setCategory(categoryField.getText());
 
             sendUpdateRequest(asset);
-
-            fixedAssetController.loadAssets(); // Refresh assets in the main table
+            fixedAssetController.updateAssetInTable(asset);
 
             ((Stage) nameField.getScene().getWindow()).close();
         }

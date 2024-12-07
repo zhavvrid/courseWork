@@ -8,43 +8,50 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.SignUpController">
+<!-- Основное окно -->
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: linear-gradient(to bottom, #243447, #2E3348);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.SignUpController">
     <children>
-        <AnchorPane focusTraversable="true" layoutY="100.0" prefHeight="300.0" prefWidth="700.0" style="-fx-background-color: #fafafa;">
-            <children>
-                <TextField fx:id="login_field" layoutX="48.0" layoutY="98.0" prefHeight="25.0" prefWidth="245.0" promptText="Логин" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5;">
-                    <font>
-                        <Font size="16.0" />
-                    </font>
-                </TextField>
-                <Button fx:id="authSignUpButton" layoutX="300.0" layoutY="227.0" minHeight="21.0" mnemonicParsing="false" onAction="#registerUser" prefHeight="37.0" prefWidth="205.0" style="-fx-background-color: #F39C63;" text="Зарегистрироваться" textFill="WHITE">
-                    <font>
-                        <Font size="17.0" />
-                    </font>
-                </Button>
-                <PasswordField fx:id="password_field" layoutX="426.0" layoutY="99.0" prefHeight="25.0" prefWidth="245.0" promptText="Пароль" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5;">
-                    <font>
-                        <Font size="16.0" />
-                    </font>
-                </PasswordField>
-            <TextField fx:id="name_field" layoutX="48.0" layoutY="27.0" prefHeight="25.0" prefWidth="245.0" promptText="Имя" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5;">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </TextField>
-            <TextField fx:id="email_field" layoutX="426.0" layoutY="27.0" prefHeight="25.0" prefWidth="245.0" promptText="e-mail" style="-fx-border-color: #C0C0C0; -fx-border-radius: 5;">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </TextField>
-            <CheckBox fx:id="adminCheckBox" layoutX="257.0" layoutY="181.0" mnemonicParsing="false" text="Администратор" />
-            <CheckBox fx:id="accountantCheckBox" layoutX="426.0" layoutY="181.0" mnemonicParsing="false" text="Бухгалтер" />
-            </children>
-        </AnchorPane>
-        <Label layoutX="232.0" layoutY="27.0" text="Учет амортизации" textFill="#f2ecec" wrapText="true">
+        <!-- Заголовок страницы -->
+        <Label layoutX="173.0" layoutY="26.0" style="-fx-font-size: 35px; -fx-font-weight: bold;" text="Регистрация учетной записи" textFill="#ffffff">
             <font>
                 <Font name="Yu Gothic UI Semibold" size="35.0" />
             </font>
         </Label>
+
+        <!-- Внутренний блок для формы -->
+        <AnchorPane layoutX="50.0" layoutY="100.0" prefHeight="350.0" prefWidth="700.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15; -fx-padding: 20;">
+            <children>
+
+                <TextField fx:id="email_field" layoutX="201.0" layoutY="20.0" prefHeight="45.0" prefWidth="280.0" promptText="e-mail" style="-fx-background-color: #F7F7F7; -fx-border-color: #3B5998; -fx-border-radius: 10; -fx-padding: 10;">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </TextField>
+
+                <TextField fx:id="login_field" layoutX="201.0" layoutY="77.0" prefHeight="45.0" prefWidth="280.0" promptText="Логин" style="-fx-background-color: #F7F7F7; -fx-border-color: #3B5998; -fx-border-radius: 10; -fx-padding: 10;">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </TextField>
+
+                <PasswordField fx:id="password_field" layoutX="201.0" layoutY="132.0" prefHeight="45.0" prefWidth="280.0" promptText="Пароль" style="-fx-background-color: #F7F7F7; -fx-border-color: #3B5998; -fx-border-radius: 10; -fx-padding: 10;">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </PasswordField>
+
+                <!-- Чекбоксы для ролей -->
+                <CheckBox fx:id="adminCheckBox" layoutX="141.0" layoutY="192.0" mnemonicParsing="false" style="-fx-font-size: 16px;" text="Администратор" />
+                <CheckBox fx:id="accountantCheckBox" layoutX="447.0" layoutY="192.0" mnemonicParsing="false" style="-fx-font-size: 16px;" text="Бухгалтер" />
+
+                <!-- Кнопка "Зарегистрироваться" -->
+                <Button fx:id="authSignUpButton" layoutX="230.0" layoutY="240.0" minHeight="21.0" mnemonicParsing="false" onAction="#registerUser" prefHeight="50.0" prefWidth="240.0" style="-fx-background-color: linear-gradient(to right, #FF6347, #F39C63); -fx-background-radius: 25; -fx-text-fill: white; -fx-font-size: 18;" text="Зарегистрироваться">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Button>
+            </children>
+        </AnchorPane>
     </children>
 </AnchorPane>

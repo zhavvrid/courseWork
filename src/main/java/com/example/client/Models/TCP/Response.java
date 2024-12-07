@@ -1,6 +1,7 @@
 package com.example.client.Models.TCP;
 
 import com.example.client.Enums.RequestType;
+import com.example.client.Models.Entities.User;
 
 public class Response {
     private String message;
@@ -9,6 +10,15 @@ public class Response {
 
     private String role;
     private int id;
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public String getRole() {
         return role;

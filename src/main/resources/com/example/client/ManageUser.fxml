@@ -8,10 +8,10 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #2E3348;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.AccountManagement">
     <children>
-        <!-- Заголовок -->
-        <Button layoutX="172.0" layoutY="14.0" style="-fx-font-size: 28; -fx-background-color: transparent; -fx-text-fill: #f2ecec;" text="Управление учетными записями" />
+        <Button fx:id="backButton" layoutX="14.0" layoutY="550.0" onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-border-color: transparent;" text="← Назад" />
 
-        <TableView fx:id="accountTable" layoutX="20.0" layoutY="70.0" prefHeight="400.0" prefWidth="760.0" style="-fx-font-size: 14;">
+        <Button layoutX="230.0" layoutY="20.0" style="-fx-font-size: 24; -fx-background-color: transparent; -fx-text-fill: #f2ecec;" text="Управление учетными записями" />
+        <TableView fx:id="accountTable" layoutX="20.0" layoutY="80.0" prefHeight="400.0" prefWidth="760.0" style="-fx-font-size: 14;">
             <columns>
                 <TableColumn fx:id="idColumn" prefWidth="50.0" text="ID" />
                 <TableColumn fx:id="roleColumn" prefWidth="150.0" text="Роль" />
@@ -21,11 +21,10 @@
             </columns>
         </TableView>
 
-        <!-- Кнопки для CRUD операций -->
         <HBox layoutX="20.0" layoutY="500.0" spacing="10.0">
-            <Button onAction="#handleAddAccount" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Добавить" />
-            <Button onAction="#handleEditAccount" style="-fx-background-color: #FF9800; -fx-text-fill: white;" text="Редактировать" />
-            <Button onAction="#handleDeleteAccount" style="-fx-background-color: #F44336; -fx-text-fill: white;" text="Удалить" />
+            <Button onAction="#handleAddAccount" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 8;" text="Добавить" />
+            <Button onAction="#handleEditAccount" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 8;" text="Редактировать" />
+            <Button onAction="#handleDeleteAccount" style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 16; -fx-background-radius: 8;" text="Удалить" />
         </HBox>
     </children>
 </AnchorPane>

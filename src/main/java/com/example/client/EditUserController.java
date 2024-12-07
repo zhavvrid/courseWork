@@ -23,9 +23,6 @@ public class EditUserController {
     private TextField login;
 
     @FXML
-    private TextField nameField;
-
-    @FXML
     private TextField password;
 
     @FXML
@@ -47,11 +44,11 @@ public class EditUserController {
 
     }
 
-
     @FXML
     private void cancel() {
-        ((Stage) nameField.getScene().getWindow()).close();
+        ((Stage) email.getScene().getWindow()).close();
     }
+
 
     private void sendUpdateRequest(User user) {
         Request request = new Request();
@@ -65,20 +62,26 @@ public class EditUserController {
 
     @FXML
     void saveUser(ActionEvent event) {
+        try {
+user.setId(user.getId());
+            user.setLogin(login.getText());
+            user.setEmail(email.getText());
+            user.setPassword(password.getText());
 
-        user.setLogin(login.getText());
-        user.setEmail(email.getText());
-        user.setPassword(password.getText());
+            Role userRole = new Role();
+            userRole.setName(role.getText());
+            user.setRole(userRole);
 
-        Role userRole = new Role();
-        userRole.setName(role.getText());
-        user.setRole(userRole);
-        sendUpdateRequest(user);
-        controller.loadUsers();
+            System.out.println("User: " + user);
 
+            sendUpdateRequest(user);
+            controller.loadUsers();
 
-        ((Stage) nameField.getScene().getWindow()).close();
-
+            ((Stage) email.getScene().getWindow()).close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
 }

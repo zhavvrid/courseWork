@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.chart.PieChart?>
+
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.ReportWindowController">
+<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.ReportWindowController">
     <children>
         <VBox layoutX="20.0" layoutY="20.0" spacing="10.0" style="-fx-background-color: #f4f4f4; -fx-padding: 10;">
-            <Button text="Отчет по амортизации активов (BarChart)" fx:id="barChartButton" onAction="#showBarChart" style="-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" />
-            <Button text="Накопленная амортизация по датам (LineChart)" fx:id="lineChartButton" onAction="#showLineChart" style="-fx-font-size: 14px; -fx-background-color: #2196F3; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" />
-            <Button text="Распределение амортизации по категориям (PieChart)" fx:id="pieChartButton" onAction="#showPieChart" style="-fx-font-size: 14px; -fx-background-color: #FF9800; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" />
-            <Button text="Сохранить отчет" fx:id="saveButton" style="-fx-font-size: 14px; -fx-background-color: #607D8B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" />
+            <Button fx:id="barChartButton" onAction="#showBarChart" style="-fx-font-size: 14px; -fx-background-color: #76cb79; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" text="Амортизация по активам (BarChart)" />
+            <Button fx:id="lineChartButton" onAction="#showLineChart" style="-fx-font-size: 14px; -fx-background-color: #43a4f3; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" text="Накопленная амортизация по датам (LineChart)" />
+            <Button fx:id="pieChartButton" onAction="#showPieChart" style="-fx-font-size: 14px; -fx-background-color: #f39c63; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" text="Распределение амортизации по категориям (PieChart)" />
+            <Button fx:id="saveButton" onAction="#saveReport" style="-fx-font-size: 14px; -fx-background-color: #607D8B; -fx-text-fill: white; -fx-border-radius: 5px; -fx-padding: 10 20;" text="Сохранить отчет" />
         </VBox>
-
-
-        <!-- BarChart -->
-        <BarChart fx:id="barChart" layoutX="150.0" layoutY="20.0" prefWidth="600.0" prefHeight="550.0" visible="true">
+        <BarChart fx:id="barChart" layoutX="380.0" layoutY="25.0" prefHeight="550.0" prefWidth="600.0" visible="true">
             <xAxis>
                 <CategoryAxis label="Активы" />
             </xAxis>
@@ -29,17 +26,15 @@
             </yAxis>
         </BarChart>
 
-        <!-- PieChart -->
-        <PieChart fx:id="pieChart" layoutX="150.0" layoutY="20.0" prefWidth="600.0" prefHeight="550.0" visible="false"/>
-
-        <!-- LineChart -->
-        <LineChart fx:id="lineChart" layoutX="150.0" layoutY="20.0" prefWidth="600.0" prefHeight="550.0" visible="false">
+        <PieChart fx:id="pieChart" layoutX="380.0" layoutY="25.0" prefHeight="550.0" prefWidth="600.0" visible="false" />
+        <LineChart fx:id="lineChart" layoutX="380.0" layoutY="25.0" prefHeight="550.0" prefWidth="600.0" visible="false">
             <xAxis>
-                <CategoryAxis label="Дата"/>
+                <CategoryAxis label="Дата" />
             </xAxis>
             <yAxis>
-                <NumberAxis label="Накопленная амортизация"/>
+                <NumberAxis label="Накопленная амортизация" />
             </yAxis>
         </LineChart>
+        <Button fx:id="backButton" layoutX="14.0" layoutY="539.0" onAction="#handleBack" style="-fx-background-color: transparent; -fx-text-fill: #607D8B; -fx-font-size: 16px; -fx-border-color: transparent;" text="← Назад" />
     </children>
 </AnchorPane>

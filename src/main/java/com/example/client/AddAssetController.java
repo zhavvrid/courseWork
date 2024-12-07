@@ -113,7 +113,7 @@ public class AddAssetController {
         request.setRequestType(RequestType.ADD_ASSET);
         request.setMessage(new Gson().toJson(asset));
 
-        String jsonRequest = new Gson().toJson(request); // Делаем JSON-строку из Request
+        String jsonRequest = new Gson().toJson(request);
         ClientSocket.getInstance().getOut().println(jsonRequest);
         ClientSocket.getInstance().getOut().flush();
 
@@ -191,7 +191,6 @@ public class AddAssetController {
 
         String selectedMethod = asset.getDepreciationMethod();
 
-        // Формируем объект запроса для отправки данных на сервер
         JsonObject searchJson = new JsonObject();
         searchJson.addProperty("assetId", asset.getId());
         searchJson.addProperty("method", selectedMethod);
@@ -201,12 +200,10 @@ public class AddAssetController {
         request.setMessage(searchJson.toString());
 
         try {
-            // Отправляем запрос на сервер для расчета амортизации
             PrintWriter out = ClientSocket.getInstance().getOut();
             out.println(gson.toJson(request));
             out.flush();
 
-            // Читаем и обрабатываем ответ от сервера
             BufferedReader in = ClientSocket.getInstance().getIn();
             String responseString = in.readLine();
             Response response = gson.fromJson(responseString, Response.class);

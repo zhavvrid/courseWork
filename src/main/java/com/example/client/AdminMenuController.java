@@ -1,5 +1,6 @@
 package com.example.client;
 
+import com.example.client.Utility.WindowUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,14 +10,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import java.io.IOException;
 
 public class AdminMenuController {
     @FXML
     private Button headerButton;
-
-    @FXML
-    private Button manageAccountsButton;
 
     @FXML
     private Button manageAssetsButton;
@@ -38,9 +38,31 @@ public class AdminMenuController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FixedAssetPanel.fxml"));
             Parent root = loader.load();
-            Stage stage = new Stage();
+            Stage stage = (Stage) manageAssetsButton.getScene().getWindow();
+
+            stage.setScene(new Scene(root));
+            stage.setTitle("Таблица основных средств");
+            stage.show();
+
+            WindowUtils.centerWindow(stage);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось открыть панель управления основными средствами.");
+        }
+    }
+
+
+    @FXML
+    private void openManageAccountWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ManageUser.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) manageAssetsButton.getScene().getWindow();
+            stage.setTitle("Управление учетными записями");
             stage.setScene(new Scene(root));
             stage.show();
+            WindowUtils.centerWindow(stage);
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Ошибка", "Не удалось открыть панель управления основными средствами.");
@@ -48,13 +70,14 @@ public class AdminMenuController {
     }
 
     @FXML
-    private void openManageAccountWindow() {
+    private void sendMessage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ManageUser.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("SendMessage.fxml"));
             Parent root = loader.load();
-            Stage stage = new Stage();
+            Stage stage = (Stage) messageAccountantButton.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.show();
+            WindowUtils.centerWindow(stage);
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Ошибка", "Не удалось открыть панель управления основными средствами.");
@@ -68,5 +91,13 @@ public class AdminMenuController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void openReportsWindow(ActionEvent actionEvent) {
+
+
+    }
+
+    public void exitApplication(ActionEvent actionEvent) {
     }
 }

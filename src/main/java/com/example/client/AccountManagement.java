@@ -10,14 +10,12 @@
     import com.google.gson.reflect.TypeToken;
     import javafx.application.Platform;
     import javafx.beans.property.SimpleStringProperty;
+    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.fxml.FXMLLoader;
     import javafx.scene.Parent;
     import javafx.scene.Scene;
-    import javafx.scene.control.Alert;
-    import javafx.scene.control.TableColumn;
-    import javafx.scene.control.TableView;
-    import javafx.scene.control.TextField;
+    import javafx.scene.control.*;
     import javafx.scene.control.cell.PropertyValueFactory;
     import javafx.stage.Stage;
 
@@ -41,7 +39,8 @@
         private TableColumn<User, String> passwordColumn;
         @FXML
         private TableColumn<User, String> emailColumn;
-
+@FXML
+private Button backButton;
         @FXML
         private TextField usernameField;
         @FXML
@@ -55,7 +54,6 @@
 
         @FXML
         private void initialize() {
-
 
             idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
             loginColumn.setCellValueFactory(new PropertyValueFactory<>("login"));
@@ -76,7 +74,8 @@
                     Stage stage = new Stage();
                     stage.setTitle("Добавление пользователя");
                     stage.setScene(new Scene(root));
-                    stage.show();
+                    stage.showAndWait();
+                    loadUsers();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -86,17 +85,20 @@
         private void handleEditAccount() {
                 User selectedUser = accountTable.getSelectionModel().getSelectedItem();
                 if (selectedUser != null) {
+                    int userId = selectedUser.getId();
+                    System.out.println("Selected User ID: " + userId);
                     try {
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("EditUser.fxml"));
                         Parent root = loader.load();
-                        Stage stage = new Stage();
-                        stage.setTitle("Редактирование основного средства");
-
                         EditUserController editController = loader.getController();
-                        editController.setUser(selectedUser, this); // Pass the current controller
+
+                        editController.setUser(selectedUser, this);
+                        Stage stage = new Stage();
+                        stage.setTitle("Редактирование пользователя");
 
                         stage.setScene(new Scene(root));
                         stage.showAndWait();
+                        loadUsers();
                     } catch (IOException e) {
                         e.printStackTrace();
                         showAlert("Ошибка", "Не удалось открыть окно редактирования.");
@@ -127,7 +129,7 @@
                             List<User> users = gson.fromJson(message, new TypeToken<List<User>>() {}.getType());
                             Platform.runLater(() -> accountTable.getItems().setAll(users));
                         } catch (JsonSyntaxException e) {
-                            Platform.runLater(() -> showAlert("Ошибка", "Неправильный формат данных: " + message));
+                            Platform.runLater(() -> showAlert("Уведомление",  message));
                         }
                     } else {
                         Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
@@ -154,12 +156,40 @@
         private void handleDeleteAccount() {
             User selectedUser = accountTable.getSelectionModel().getSelectedItem();
             if (selectedUser != null) {
-                sendDeleteRequest(selectedUser.getId());
-                loadUsers();
+                Request request = new Request();
+                request.setRequestType(RequestType.DELETE_USER);
+                request.setMessage(String.valueOf(selectedUser.getId()));
+
+                try {
+                    PrintWriter out = ClientSocket.getInstance().getOut();
+                    out.println(gson.toJson(request));
+                    out.flush();
+
+                    BufferedReader in = ClientSocket.getInstance().getIn();
+                    String responseString = in.readLine();
+
+                    if (responseString != null) {
+                        Response response = gson.fromJson(responseString, Response.class);
+                        if (response.getSuccess()) {
+                            Platform.runLater(() -> {
+                                loadUsers(); // Обновляем таблицу только после успешного удаления
+                                showAlert("Успех", "Пользователь успешно удален.");
+                            });
+                        } else {
+                            Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+                        }
+                    } else {
+                        Platform.runLater(() -> showAlert("Ошибка", "Сервер не вернул ответ."));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    showAlert("Ошибка", "Не удалось удалить пользователя: " + e.getMessage());
+                }
             } else {
-                showAlert("Ошибка", "Не выбран актив для удаления.");
+                showAlert("Ошибка", "Не выбран пользователь для удаления.");
             }
         }
+
         private void sendDeleteRequest(int userId) {
             Request request = new Request();
             request.setRequestType(RequestType.DELETE_USER);
@@ -178,4 +208,21 @@
             passwordField.clear();
             emailField.clear();
         }
+
+        @FXML
+        public void handleBack(ActionEvent actionEvent) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.close();
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("AdminMenu.fxml"));
+                Stage previousStage = new Stage();
+                previousStage.setScene(new Scene(root));
+                previousStage.setTitle("Меню администратора");
+                previousStage.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert("Ошибка", "Не удалось открыть предыдущее меню: " + e.getMessage());
+            }
+        }
+
     }

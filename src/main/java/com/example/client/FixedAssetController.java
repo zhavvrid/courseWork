@@ -7,6 +7,7 @@ import com.example.client.Models.Entities.FixedAsset;
 import com.example.client.Models.TCP.Request;
 import com.example.client.Models.TCP.Response;
 import com.example.client.Utility.ClientSocket;
+import com.example.client.Utility.WindowUtils;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
@@ -15,6 +16,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -74,6 +76,15 @@ public class FixedAssetController {
 
     @FXML
     private TextField searchField;
+    @FXML
+    private Button backButton;
+
+    @FXML
+    private Button calculateButton;
+    @FXML
+    private Button viewAmortizationAssets;
+    @FXML
+    private Button viewAssets;
 
     @FXML
     private ComboBox<String> searchParameterComboBox;
@@ -98,6 +109,7 @@ public class FixedAssetController {
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Добавление основного средства");
+            stage.setOnHidden(e -> loadAssets());
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
@@ -127,16 +139,16 @@ public class FixedAssetController {
                     List<FixedAsset> assets = gson.fromJson(message, new TypeToken<List<FixedAsset>>() {
                     }.getType());
                     Platform.runLater(() -> {
-                        assetsTable.getItems().setAll(assets);
+                        assetsTable.getItems().clear();
+                        assetsTable.getItems().addAll(assets);
                         assetsList.setAll(assets);
 
                     });
                 } catch (JsonSyntaxException e) {
-                    // Обработка ошибки разбора JSON
-                    Platform.runLater(() -> showAlert("Ошибка", "Неправильный формат данных: " + message));
+                    Platform.runLater(() -> showAlert("Уведомление",  message));
                 }
             } else {
-                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+                Platform.runLater(() -> showAlert("Уведомление", response.getMessage()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,6 +169,18 @@ public class FixedAssetController {
         categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCategory()));
     }
 
+    public void updateAssetInTable(FixedAsset updatedAsset) {
+        ObservableList<FixedAsset> items = assetsTable.getItems();
+        for (int i = 0; i < items.size(); i++) {
+            FixedAsset asset = items.get(i);
+            if (asset.getId() == updatedAsset.getId()) {
+                // Обновляем данные в таблице
+                items.set(i, updatedAsset);
+                break;
+            }
+        }
+    }
+
 
     @FXML
     private void editSelectedAsset() {
@@ -170,7 +194,7 @@ public class FixedAssetController {
 
                 EditAssetController editController = loader.getController();
                 editController.setAsset(selectedAsset, this);
-
+                stage.setOnHidden(e -> loadAssets());
                 stage.setScene(new Scene(root));
                 stage.showAndWait();
             } catch (IOException e) {
@@ -188,11 +212,16 @@ public class FixedAssetController {
         FixedAsset selectedAsset = assetsTable.getSelectionModel().getSelectedItem();
         if (selectedAsset != null) {
             sendDeleteRequest(selectedAsset.getId());
-            loadAssets();
+            Platform.runLater(() -> {
+                assetsTable.getItems().remove(selectedAsset);
+                loadAssets();
+            });
+
         } else {
             showAlert("Ошибка", "Не выбран актив для удаления.");
         }
     }
+
     private void sendDeleteRequest(int assetId) {
         Request request = new Request();
         request.setRequestType(RequestType.DELETE_ASSET);
@@ -212,8 +241,6 @@ public class FixedAssetController {
         out.println(gson.toJson(request));
         out.flush();
     }
-
-
 
     @FXML
     private void searchAssets() {
@@ -247,7 +274,7 @@ public class FixedAssetController {
                 }.getType());
                 Platform.runLater(() -> assetsTable.getItems().setAll(filteredAssets));
             } else {
-                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+                Platform.runLater(() -> showAlert("Уведомление", response.getMessage()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -261,27 +288,25 @@ public class FixedAssetController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("CalculateAmortization.fxml"));
             Parent root = loader.load();
-
-            // Получаем выбранный актив
             FixedAsset selectedAsset = assetsTable.getSelectionModel().getSelectedItem();
             if (selectedAsset == null) {
                 showAlert("Ошибка", "Необходимо выбрать актив для расчета амортизации.");
                 return;
             }
 
-            // Устанавливаем актив в контроллер расчета амортизации
             CalculateAmortizationController controller = loader.getController();
-            controller.setSelectedAsset(selectedAsset); // Вызовет расчет амортизации и обновит таблицу
+            controller.setSelectedAsset(selectedAsset);
 
-            // Открываем окно расчета
-            Stage stage = new Stage();
-            stage.setTitle("Рассчитать амортизацию");
+            Stage stage = (Stage) calculateButton.getScene().getWindow();
+            stage.setTitle("Расчет амортизации");
             stage.setScene(new Scene(root));
             stage.show();
+            WindowUtils.centerWindow(stage);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     @FXML
     public void loadAmortization() {
@@ -297,6 +322,7 @@ public class FixedAssetController {
             BufferedReader in = ClientSocket.getInstance().getIn();
             String responseString = in.readLine();
             Response response = gson.fromJson(responseString, Response.class);
+            System.out.println("Response string: " + responseString);
 
             if (response.getSuccess()) {
                 JsonArray amortizationResults = gson.fromJson(response.getMessage(), JsonArray.class);
@@ -308,11 +334,11 @@ public class FixedAssetController {
                         CalculateAmortizationController calculateAmortizationController = loader.getController();
 
                         calculateAmortizationController.displayAmortizationResults(amortizationResults);
-
-                        Stage stage = new Stage();
+                        Stage stage = (Stage) viewAmortizationAssets.getScene().getWindow();
                         stage.setTitle("Результаты амортизации");
                         stage.setScene(new Scene(root));
                         stage.show();
+                        WindowUtils.centerWindow(stage);
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -320,13 +346,29 @@ public class FixedAssetController {
                     }
                 });
             } else {
-                Platform.runLater(() -> showAlert("Ошибка", response.getMessage()));
+                Platform.runLater(() -> showAlert("Уведомление", response.getMessage()));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @FXML
+    public void handleBack(ActionEvent actionEvent) {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("AdminMenu.fxml"));
+            Stage previousStage = new Stage();
+            previousStage.setScene(new Scene(root));
+            previousStage.setTitle("Меню администратора");
+            previousStage.show();
+            WindowUtils.centerWindow(stage);
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось открыть предыдущее меню: " + e.getMessage());
+        }
+    }
 
 
 

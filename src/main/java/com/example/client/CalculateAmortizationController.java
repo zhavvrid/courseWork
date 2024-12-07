@@ -6,6 +6,7 @@ import com.example.client.Models.Entities.FixedAsset;
 import com.example.client.Models.TCP.Request;
 import com.example.client.Models.TCP.Response;
 import com.example.client.Utility.ClientSocket;
+import com.example.client.Utility.WindowUtils;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
@@ -14,8 +15,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
@@ -71,6 +74,11 @@ public class CalculateAmortizationController {
 
     @FXML
     private LineChart<String, Number> depreciationLineChart;
+    @FXML
+    private Button backButton;
+
+    @FXML
+    private Button generateReportButton;
 
     private FixedAsset selectedAsset;
     private final Gson gson = new Gson();
@@ -126,8 +134,6 @@ public class CalculateAmortizationController {
         }
     }
 
-
-
     @FXML
     private void generateReport() {
         ObservableList<DepreciationCalculation> data = depreciationTable.getItems();
@@ -135,18 +141,13 @@ public class CalculateAmortizationController {
             showAlert("Ошибка", "Нет данных для генерации отчета.");
             return;
         }
-
         try {
-            // Загрузка FXML для окна отчета
             FXMLLoader loader = new FXMLLoader(getClass().getResource("ReportWindow.fxml"));
             AnchorPane reportRoot = loader.load();
 
-            // Получение контроллера окна отчета
             ReportWindowController reportController = loader.getController();
-            reportController.createChart(new ArrayList<>(data)); // Передаем данные для графика
-
-            // Создание нового окна для отчета
-            Stage reportStage = new Stage();
+            reportController.createChart(new ArrayList<>(data));
+            Stage reportStage = (Stage) generateReportButton.getScene().getWindow();
             reportStage.setTitle("Отчет по амортизации");
             reportStage.setScene(new Scene(reportRoot));
             reportStage.show();
@@ -205,10 +206,9 @@ public class CalculateAmortizationController {
         }
     }
 
-    // Метод для отображения диалога ввода ставки амортизации
     private BigDecimal getDepreciationRateFromUser() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Введите ставку амортизации");
+        dialog.setTitle("Уведомление");
         dialog.setHeaderText("Введите ставку амортизации для метода остаточной стоимости.");
         dialog.setContentText("Ставка амортизации:");
 
@@ -226,11 +226,6 @@ public class CalculateAmortizationController {
 
 
 
-    @FXML
-    private void exportToExcel() {
-        // Реализуйте логику экспорта данных в Excel
-        showAlert("Информация", "Экспорт в Excel будет реализован позже.");
-    }
 
 @FXML
     public void loadAmortization() {
@@ -272,4 +267,21 @@ public class CalculateAmortizationController {
 
     public void setDepreciationRate(BigDecimal depreciationRate) {
     }
+    @FXML
+    public void handleBack(ActionEvent actionEvent) {
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        stage.close();
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("FixedAssetPanel.fxml"));
+            Stage previousStage = new Stage();
+            previousStage.setScene(new Scene(root));
+            previousStage.setTitle("Таблица основных средств");
+            previousStage.show();
+            WindowUtils.centerWindow(stage);
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Ошибка", "Не удалось открыть предыдущее меню: " + e.getMessage());
+        }
+    }
+
 }

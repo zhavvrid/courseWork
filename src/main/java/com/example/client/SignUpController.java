@@ -13,6 +13,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class SignUpController {
         request.setRequestType(RequestType.REGISTER);
         request.setMessage(new Gson().toJson(user));
 
-        String jsonRequest = new Gson().toJson(request); // Делаем JSON-строку из Request
+        String jsonRequest = new Gson().toJson(request);
         ClientSocket.getInstance().getOut().println(jsonRequest);
         ClientSocket.getInstance().getOut().flush();
 
@@ -67,13 +68,19 @@ public class SignUpController {
             String responseLine = in.readLine();
             if (responseLine != null) {
                 Response response = new Gson().fromJson(responseLine, Response.class);
-                showAlert("Ответ от сервера", response.getMessage());
+                showAlert("Результат", response.getMessage());
+                closeWindow();
             }
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Ошибка", "Ошибка при получении ответа от сервера: " + e.getMessage());
         }
     }
+    private void closeWindow() {
+        Stage stage = (Stage) login_field.getScene().getWindow();
+        stage.close();
+    }
+
     private void clearFields() {
         login_field.clear();
         password_field.clear();
